@@ -904,6 +904,29 @@ body {
 }
 
 
+/* ══ STORY SWITCHER DROPDOWN ══ */
+#story-switcher {
+  text-align:center;
+  padding:3px 10px 4px;
+}
+#story-select-dropdown {
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,215,0,.4);
+  border-radius:8px;
+  color:var(--yellow);
+  font-family:'Fredoka One',cursive;
+  font-size:.85rem;
+  padding:5px 12px;
+  cursor:pointer;
+  -webkit-appearance:none;
+  appearance:none;
+  text-align:center;
+}
+#story-select-dropdown option {
+  background:#1a1a2e;
+  color:#fff;
+}
+
 @keyframes poof-up{
   from{opacity:1;transform:scale(.5) translateY(0);}
   to  {opacity:0;transform:scale(2) translateY(-60px);}
@@ -1029,6 +1052,13 @@ body {
 <!-- ══ ARCADE BANNER ══ -->
 <div id="arcade-wrap">
   <div id="arcade-title">🎮 FART DASH ARCADE 💨</div>
+  <div id="story-switcher">
+    <select id="story-select-dropdown" onchange="switchStory(this.value)">
+      <option value="" disabled>📚 Switch Story...</option>
+      <option value="benson">💨 Farty Fred (2nd Grade)</option>
+      <option value="kate">👑 Kate Is Always Right (4th Grade)</option>
+    </select>
+  </div>
   <div id="arcade-hud">
     <div id="hud-left">
       <div id="score-display" class="hud-label">⚡ CLEARED: <span id="jump-num">0</span></div>
@@ -3359,6 +3389,16 @@ function selectStory(which){
   updateTabCount();
   renderBadges();
   render(which==='kate' ? 'kate_start' : 'start');
+}
+
+function switchStory(which){
+  if(!which) return;
+  // Reset dropdown to placeholder
+  const dd = document.getElementById('story-select-dropdown');
+  if(dd) dd.value='';
+  selectStory(which);
+  // Scroll to top so story is visible
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 window.addEventListener('DOMContentLoaded', function(){
