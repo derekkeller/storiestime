@@ -317,6 +317,7 @@ body {
   display:flex; align-items:center; gap:6px;
   transition:transform .15s;
 }
+
 #vocab-tab:active{transform:scale(.94);}
 #vocab-tab .tab-count {
   background:#fff;
@@ -1204,6 +1205,7 @@ body {
   </div>
   <div id="bible-nav">
     <button class="bible-nav-btn prev hidden" id="bible-prev" onclick="biblePrevPage()">◀ Back</button>
+    <button class="bible-nav-btn" id="bible-my-words" onclick="openDrawer()" style="background:var(--purple);color:#fff;border-bottom-color:#4A0080;font-size:.8rem;padding:8px 12px;">📚 My Words <span id="bible-word-count" style="background:#fff;color:var(--purple);border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;margin-left:4px;">0</span></button>
     <button class="bible-nav-btn" id="bible-next" onclick="bibleNextPage()">Next ▶</button>
   </div>
 </div>
@@ -2553,6 +2555,8 @@ function setStatus(word, pageId, status) {
 function updateTabCount() {
   const el = document.getElementById('tab-count');
   if (el) el.textContent = vocabList.length;
+  const bel = document.getElementById('bible-word-count');
+  if (bel) bel.textContent = vocabList.length;
 }
 
 // ── TOAST ──
@@ -4056,11 +4060,14 @@ function startBibleStory(which){
   const title = which === 'kate_bible' ? '🌅 Kate Bible' : '🌄 Benson Bible';
   document.getElementById('bible-title').textContent = title;
   document.getElementById('bible-reader').classList.add('visible');
+  document.getElementById('vocab-tab').style.display='none';
+  updateTabCount();
   renderBiblePage();
 }
 
 function exitBibleStory(){
   document.getElementById('bible-reader').classList.remove('visible');
+  document.getElementById('vocab-tab').style.display='';
   // Show story selector
   document.getElementById('story-selector').style.display = 'flex';
   bibleStory = null;
