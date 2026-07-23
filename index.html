@@ -1100,6 +1100,9 @@ body {
   color:#2C1810;
 }
 .bible-page-body p { margin-bottom:12px; }
+.bible-page-body .word { color:#1565C0; text-decoration:underline dotted; cursor:help; }
+.bible-page-body .any-word { cursor:pointer; text-decoration:underline dotted rgba(150,150,150,.5); }
+.bible-page-body .short-word { border-radius:3px; }
 .bible-verse {
   font-style:italic;
   background:#FFF3DC;
@@ -2378,20 +2381,19 @@ let popupOpen = false;
 // ── WORD TAP HANDLER ──
 document.addEventListener('click', function(e) {
   // Tapped a pre-tagged vocab word (blue)
+  const textContainers = '.story-text, .bible-page-body';
   const wordEl = e.target.closest('.word');
-  if (wordEl && wordEl.closest('.story-text')) {
+  if (wordEl && (wordEl.closest('.story-text') || wordEl.closest('.bible-page-body'))) {
     e.preventDefault(); e.stopPropagation();
     showWordPopup(wordEl, true); return;
   }
-  // Tapped a .big or .funny coloured span
   const colorEl = e.target.closest('.big, .funny');
-  if (colorEl && colorEl.closest('.story-text')) {
+  if (colorEl && (colorEl.closest('.story-text') || colorEl.closest('.bible-page-body'))) {
     e.preventDefault(); e.stopPropagation();
     showWordPopup(colorEl, false); return;
   }
-  // Tapped a plain wrapped word
-  const anyEl = e.target.closest('.any-word');
-  if (anyEl && anyEl.closest('.story-text')) {
+  const anyEl = e.target.closest('.any-word, .short-word');
+  if (anyEl && (anyEl.closest('.story-text') || anyEl.closest('.bible-page-body'))) {
     e.preventDefault(); e.stopPropagation();
     showWordPopup(anyEl, false); return;
   }
@@ -2492,7 +2494,7 @@ function fireballBonus(yes){
 function popupSave(e, word) {
   e.stopPropagation();
   let target = null;
-  document.querySelectorAll('.story-text .word, .story-text .any-word').forEach(el => {
+  document.querySelectorAll('.story-text .word, .story-text .any-word, .bible-page-body .word, .bible-page-body .any-word').forEach(el => {
     if (el.textContent.replace(/[.,!?'"]/g,'').trim() === word) target = el;
   });
   if (target) saveWord(target);
@@ -2509,7 +2511,7 @@ function popupSave(e, word) {
 }
 
 function getSentenceFor(el) {
-  const parent = el.closest('.story-text');
+  const parent = el.closest('.story-text') || el.closest('.bible-page-body');
   if (!parent) return '';
   // Use innerText to get readable text, strip emoji noise
   const full = parent.innerText || parent.textContent;
@@ -2648,7 +2650,7 @@ function endFlash() {
 
 // ── RE-APPLY saved highlights when page renders ──
 function reapplySavedHighlights() {
-  document.querySelectorAll('.story-text .word, .story-text .any-word').forEach(el => {
+  document.querySelectorAll('.story-text .word, .story-text .any-word, .bible-page-body .word, .bible-page-body .any-word').forEach(el => {
     const word = el.textContent.replace(/[.,!?'"]/g,'').trim();
     if (vocabList.find(v => v.word.toLowerCase() === word.toLowerCase())) {
       el.classList.add('saved');
@@ -3496,15 +3498,16 @@ function spawnPoof(x,y){
 }
 
 // ── WRAP ALL WORDS (5+ letters) AS TAPPABLE ──
-function stampWordIndices(){
+function stampWordIndices(containerId){
+  const cid = containerId || 'story-text';
   let idx=0;
   document.querySelectorAll(
-    '#story-text .word, #story-text .any-word, #story-text .short-word'
+    '#'+cid+' .word, #'+cid+' .any-word, #'+cid+' .short-word'
   ).forEach(s=>{ s.dataset.wi=idx++; });
 }
 
-function wrapAllWords(){
-  const container=document.getElementById('story-text');
+function wrapAllWords(containerId){
+  const container=document.getElementById(containerId||'story-text');
   if(!container) return;
   const walker=document.createTreeWalker(container,NodeFilter.SHOW_TEXT,{
     acceptNode(node){
@@ -4095,7 +4098,7 @@ function renderBiblePage(){
   document.getElementById('bible-page-body').innerHTML = page.text;
 
   // Wrap words for highlighting
-  setTimeout(()=>{ wrapAllWords(); reapplySavedHighlights(); stampWordIndices(); }, 50);
+  setTimeout(()=>{ wrapAllWords('bible-page-body'); reapplySavedHighlights(); stampWordIndices('bible-page-body'); }, 50);
 
   // Nav buttons
   const prev = document.getElementById('bible-prev');
