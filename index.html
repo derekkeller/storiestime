@@ -1028,6 +1028,23 @@ body {
   font-weight:700; line-height:1.5;
 }
 
+/* ══ BIBLE FONT SIZE BUTTONS ══ */
+#bible-font-btns {
+  display:flex; gap:4px; align-items:center;
+}
+.bible-font-btn {
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:7px;
+  color:#fff;
+  font-family:'Fredoka One',cursive;
+  font-size:.8rem;
+  padding:4px 8px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.bible-font-btn:active { background:rgba(255,255,255,.3); }
+
 /* ══ BIBLE STORY READER ══ */
 #bible-reader {
   display:none;
@@ -1196,6 +1213,10 @@ body {
   <div id="bible-header">
     <button id="bible-back-btn" onclick="exitBibleStory()">← Back</button>
     <div id="bible-title">📖 Bible Story</div>
+    <div id="bible-font-btns">
+      <button class="bible-font-btn" onclick="changeBibleFont(-1)" title="Smaller">A−</button>
+      <button class="bible-font-btn" onclick="changeBibleFont(1)" title="Larger">A+</button>
+    </div>
   </div>
   <div id="bible-dots"></div>
   <img id="bible-img" src="" alt="" style="display:none;">
@@ -3882,9 +3903,9 @@ Benson went too.
 
 Jesus sat down in the grass. No crown. No fancy chair. Just Jesus, sitting on a hill, smiling at everyone like he loved every single one of them.
 
-At the top of the hill, Jesus looked out at the crowd. And then he started talking.
+<div class="bible-verse">"And then he started talking."</div>
 
-What he said that day changed everything.` },
+<div class="closing-note">📖 What he said that day changed everything.</div>` },
   { title: 'The Boy Who Felt Like He Wasn\'t Enough', text: `Jesus looked out at the crowd and said:
 
 <div class="bible-verse">"Blessed are the poor in spirit — for theirs is the kingdom of heaven."</div>
@@ -3901,9 +3922,7 @@ The feeling after he screamed at Kate and couldn't stop. The feeling after he cr
 
 That feeling of: <em>I did it again. Something is wrong with me.</em>
 
-Jesus looked like he was talking straight to Benson.
-
-<em>Those people,</em> Jesus said, <em>are not forgotten. They are blessed.</em>` },
+<div class="prayer-bubble">Jesus looked like he was talking straight to Benson.<br><br><em>Those people are not forgotten. They are blessed.</em></div>` },
   { title: 'The Volcano Inside', text: `Here is something true about Benson.
 
 He has a volcano inside him.
@@ -3920,9 +3939,9 @@ Or Kylie, who is two years old and means no harm at all, toddles over to his mos
 
 And the volcano erupts.
 
-Benson knows, afterward, that the volcano made things worse. Not better. It always makes things worse.
+<div class="volcano-bubble">⚡ Benson always knew, afterward, that the volcano made things worse. Not better. It <em>always</em> made things worse.</div>
 
-He just didn't know how to stop it.` },
+<p>He just didn't know how to stop it.</p>` },
   { title: 'Leo on the Trampoline', text: `One time, Benson was jumping on the trampoline with his friends. They had a game. Each person got a turn. Everyone was waiting in line.
 
 A little boy named Leo — smaller than Benson, younger than Benson — cut right in front of him.
@@ -3939,9 +3958,11 @@ Every time Benson erupted, Leo smiled. Because Leo knew exactly which button to 
 
 Benson's dad watched all of this.
 
-Later he said something Benson never forgot:
+Later that night, he sat next to Benson and said something quietly — something Benson never forgot:
 
-<div class="bible-verse">"Buddy. Leo was trying to steal your joy. And you handed it right to him."</div>` },
+<div class="bible-verse">"Buddy. Leo was trying to steal your joy. And you handed it right to him."</div>
+
+<div class="closing-note">💭 Benson thought about that for a long time.</div>` },
   { title: 'Blessed Are the Meek', text: `Back on the hill, Jesus kept talking.
 
 <div class="bible-verse">"Blessed are the meek."</div>
@@ -3964,7 +3985,7 @@ But because Benson knew who he was. And Leo couldn't take that away.
 
 <div class="bible-verse">Blessed are the meek.</div>
 
-Strong enough on the inside that nothing on the outside can knock you over.` },
+<div class="eli-bubble">💪 <em>Strong enough on the inside that nothing on the outside can knock you over.</em></div>` },
   { title: 'The Hardest Thing Jesus Said', text: `Then Jesus said the part that made everyone go quiet.
 
 <div class="bible-verse">"Love your enemies. Pray for the people who hurt you."</div>
@@ -3999,6 +4020,8 @@ He didn't want to hide his light.
 He wanted to shine.
 
 But he knew he couldn't do it alone.
+
+<div class="closing-note">✨ <em>Nobody can. That's the whole point.</em></div>
 
 He closed his eyes right there on the hillside.
 
@@ -4054,17 +4077,18 @@ He doesn't have to fight it alone.
 
 <div class="bible-verse">Blessed are the peacemakers — for they shall be called children of God.</div>
 
-<strong>Children of God.</strong>
-
-That's who Benson is.
-
-Not a volcano.
-
-A light. ✨
+<div class="victory-bubble">🌟 Children of God. That's who Benson is.<br>Not a volcano. A light.</div>
 
 <div class="closing-note">💛 <em>Next time you feel the volcano starting — close your eyes, take one breath, and say:<br><br>"God. Take this feeling away from me. Fill me with love instead."<br><br>You don't have to be perfect. You just have to try.</em></div>` }
 ];
 
+
+
+let bibleFontSize = 1.22; // rem
+function changeBibleFont(dir){
+  bibleFontSize = Math.min(1.8, Math.max(0.9, bibleFontSize + dir * 0.1));
+  document.getElementById('bible-page-body').style.fontSize = bibleFontSize + 'rem';
+}
 
 let bibleStory = null;  // 'kate_bible' or 'benson_bible'
 let biblePageIdx = 0;
