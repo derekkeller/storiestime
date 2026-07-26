@@ -225,6 +225,15 @@ body {
   font-size:1.4rem;
   margin-bottom:2px;
 }
+#word-popup .wp-def {
+  font-size:.82rem;
+  color:#2E7D32;
+  background:#F0FFF4;
+  border-radius:6px;
+  padding:4px 8px;
+  margin:4px 0;
+  line-height:1.4;
+}
 #word-popup .wp-say {
   font-size:.85rem;
   color:#555;
@@ -2427,6 +2436,7 @@ let popupPausedReading = false; // tracks if popup caused the pause
 function showWordPopup(el, isTagged) {
   const word     = el.textContent.replace(/[.,!?'"]/g,'').trim();
   const say      = isTagged ? (el.dataset.say || '') : '';
+  const defn     = isTagged ? (el.dataset.def || '') : '';
   const sentence = getSentenceFor(el);
   const alreadySaved = !!vocabList.find(
     v => v.word.toLowerCase() === word.toLowerCase() && v.pageId === currentPageId
@@ -2435,6 +2445,7 @@ function showWordPopup(el, isTagged) {
   popup.innerHTML =
     '<div class="wp-word">'+word+'</div>' +
     (say ? '<div class="wp-say">🔊 '+say+'</div>' : '') +
+    (defn ? '<div class="wp-def">📖 '+defn+'</div>' : '') +
     (sentence ? '<div class="wp-sentence">"'+sentence+'"</div>' : '') +
     '<div class="wp-buttons">' +
       '<button class="wp-save '+(alreadySaved?'already':'')+'" onclick="popupSave(event,\''+word.replace(/'/g,"\\'")+'\')">'+(alreadySaved?'✅ Saved!':'📚 Save Word')+'</button>' +
@@ -3677,9 +3688,9 @@ So when she climbed the hill and sat down in the grass, she wasn't expecting muc
 
 Jesus sat down too.
 
-He looked out at the crowd — and then, somehow, he looked directly at her. Not in a frightening way. Not in a <span class="word" data-say="yoor-in-trub-ul">you're-in-trouble</span> way.
+He looked out at the crowd — and then, somehow, he looked directly at her. Not in a frightening way. Not in a <span class="word" data-say="yoor-in-trub-ul" data-def="when someone is upset with you for doing something wrong">you're-in-trouble</span> way.
 
-In a way that said: <em>I know exactly who you are. Every single part. And I came here anyway.</em>
+In a way that said: <em>I know exactly who you are. Every single part.</em>
 
 Kate straightened up.
 
@@ -3688,28 +3699,28 @@ She had a feeling this was going to be different.` },
 
 <div class="bible-verse">"Blessed are the poor in spirit, for theirs is the kingdom of heaven."</div>
 
-Kate frowned slightly. She was not poor in spirit. She was <span class="word" data-say="kon-fih-dent">confident</span>, resourceful, and often right — though she was absolutely convinced she was right even when she wasn't.
+Kate frowned slightly. She was not poor in spirit. She was <span class="word" data-say="kon-fih-dent" data-def="feeling sure about yourself and what you can do">confident</span>, resourceful, and often right — though she was absolutely convinced she was right even when she wasn't.
 
 But something made her stay with those words.
 
 <em>Poor in spirit.</em> Not poor in money. Not poor in talent. Poor in the sense of empty. Hollow. Like there's a place inside you that feels like it isn't enough — no matter how smart you are, no matter how often you're right.
 
-Kate thought about the moments she teased Benson. She told herself it was just joking. That he was too <span class="word" data-say="sen-sih-tiv">sensitive</span>. That she wasn't being deliberately <span class="word" data-say="kru-el">cruel</span> — she was just teasing.
+Kate thought about the moments she teased Benson. She told herself it was just joking. That he was too <span class="word" data-say="sen-sih-tiv" data-def="having strong feelings that get hurt easily">sensitive</span>. That she wasn't being deliberately <span class="word" data-say="kru-el" data-def="being mean on purpose in a way that hurts someone">cruel</span> — she was just teasing.
 
-But there was always a small voice afterward — quiet, <span class="word" data-say="un-kum-fer-tuh-bul">uncomfortable</span> — that whispered: <em>that wasn't your best self, Kate.</em>
+But there was always a small voice afterward — quiet, <span class="word" data-say="un-kum-fer-tuh-bul" data-def="a feeling that something is not quite right">uncomfortable</span> — that whispered: <em>that wasn't your best self, Kate.</em>
 
 She had been ignoring that voice for a while.
 
-Maybe Jesus wasn't talking about weakness. Maybe he was talking about <span class="word" data-say="on-es-tee">honesty</span>. About the courage to admit that the voice was right.` },
+Maybe Jesus wasn't talking about weakness. Maybe he was talking about <span class="word" data-say="on-es-tee" data-def="telling the truth, even when it is hard">honesty</span>. About the courage to admit that the voice was right.` },
   { title: 'Blessed Are Those Who Mourn', text: `<div class="bible-verse">"Blessed are those who mourn, for they will be comforted."</div>
 
 This one surprised Kate even more.
 
-<span class="word" data-say="mor-ning">Mourning</span> was for people who had lost something. Who were <span class="word" data-say="gree-ving">grieving</span>. But Jesus said those people were <em>blessed.</em>
+<span class="word" data-say="mor-ning" data-def="feeling very sad about something you have lost">Mourning</span> was for people who had lost something. Who were <span class="word" data-say="gree-ving" data-def="feeling deep sadness when something important is gone">grieving</span>. But Jesus said those people were <em>blessed.</em>
 
 She thought about Benson.
 
-She thought about the look on his face — not when he was angry, not when he was yelling back — but the look just before. That split second before the <span class="word" data-say="ex-ploh-zhun">explosion</span>. When he was just a little boy who didn't understand why his sister was being cruel.
+She thought about the look on his face — not when he was angry, not when he was yelling back — but the look just before. That split second before the <span class="word" data-say="ex-ploh-zhun" data-def="when something bursts out suddenly with great force">explosion</span>. When he was just a little boy who didn't understand why his sister was being cruel.
 
 She had seen that look many times. She had chosen to keep going anyway.
 
@@ -3717,12 +3728,12 @@ What if Benson was mourning something? Not in a dramatic way. But quietly — wh
 
 And what about Kate herself? Was she mourning the kind of sister she actually wanted to be? The one she was, somewhere underneath all the sharpness?
 
-Jesus said those people would be <span class="word" data-say="kum-fer-ted">comforted</span>. That meant the mourning didn't have to be permanent.` },
+Jesus said those people would be <span class="word" data-say="kum-fer-ted" data-def="made to feel better and less sad or scared">comforted</span>. That meant the mourning didn't have to be permanent.` },
   { title: 'You Are the Salt of the Earth', text: `<div class="bible-verse">"You are the salt of the earth."</div>
 
-Kate understood this one immediately — she had a gift for understanding things quickly, which was one of her best qualities and <span class="word" data-say="oh-kay-zhun-al-ee">occasionally</span> one of her most exhausting ones.
+Kate understood this one immediately — she had a gift for understanding things quickly, which was one of her best qualities and <span class="word" data-say="oh-kay-zhun-al-ee" data-def="sometimes, but not very often">occasionally</span> one of her most exhausting ones.
 
-Salt makes everything better. A meal without salt is flat and forgettable. But salt doesn't announce itself. It just works. It <span class="word" data-say="el-uh-vayts">elevates</span> everything around it quietly, without demanding credit.
+Salt makes everything better. A meal without salt is flat and forgettable. But salt doesn't announce itself. It just works. It <span class="word" data-say="el-uh-vayts" data-def="makes something better or raises it up">elevates</span> everything around it quietly, without demanding credit.
 
 Jesus continued: <em>"But if the salt loses its saltiness — it isn't good for anything anymore."</em>
 
@@ -3741,26 +3752,34 @@ Kate did not want to be that.` },
 
 <div class="bible-verse">"You have heard that it was said — do not murder. But I tell you, anyone who is angry with a brother or sister is already in danger."</div>
 
-He wasn't talking about physical harm. He was talking about something more <span class="word" data-say="pruh-sise">precise</span>.
+He wasn't talking about physical harm. He was talking about something more <span class="word" data-say="pruh-sise" data-def="very exact and correct, with no mistakes">precise</span>.
 
-He was talking about what happens when you use your <span class="word" data-say="in-tel-ih-jence">intelligence</span>, your words, your perfect sense of timing — to hurt someone who can't protect themselves from you.
+He was talking about what happens when you use your <span class="word" data-say="in-tel-ih-jence" data-def="the ability to learn and understand things quickly">intelligence</span>, your words, your perfect sense of timing — to hurt someone who can't protect themselves from you.
 
 Benson couldn't protect himself from Kate. Not really.
 
-She was older. She was sharper. She had spent seven years <span class="word" data-say="meth-ik-yoo-lus-lee">meticulously</span> learning exactly where his edges were. And she used that knowledge. <span class="word" data-say="deh-lib-er-it-lee">Deliberately</span>. Watching him unravel and feeling, if she was honest, a small ugly <span class="word" data-say="sat-is-fak-shun">satisfaction</span> when it worked.
+She was older. She was sharper. She had spent seven years <span class="word" data-say="meth-ik-yoo-lus-lee" data-def="doing something very carefully and paying attention to every detail">meticulously</span> learning exactly where his edges were. And she used that knowledge. <span class="word" data-say="deh-lib-er-it-lee" data-def="doing something on purpose, not by accident">Deliberately</span>. Watching him unravel and feeling, if she was honest, a small ugly <span class="word" data-say="sat-is-fak-shun" data-def="the good feeling you get when something goes the way you wanted">satisfaction</span> when it worked.
 
 Jesus didn't flinch from the truth of it.
 
 <div class="bible-verse">"If you remember that your brother has something against you — go first and be reconciled. Then come back."</div>
 
-Make it right first. Then bring your best self.
+Make it right first. Then come back and pray.
 
-Kate stared at the grass.` },
+Kate thought about that.
+
+It was like Jesus was saying: don't bring me your prayers and your big words while Benson is still hurting. That doesn't count. Fix it with him first.
+
+<div class="eli-bubble">Imagine going to Mom and saying "I love you so much" and giving her a big hug — while Benson is sitting right there crying because of something you said five minutes ago.<br><br>Mom would say: <em>that's sweet, honey. Now go say sorry to your brother.</em><br><br>Jesus was saying the same thing. Except it wasn't Mom. It was God.</div>
+
+<div class="closing-note">💛 Being kind to God starts with being kind to the people right next to you.</div>
+
+Kate stared at the grass for a long time.` },
   { title: 'Do Not Judge', text: `<div class="bible-verse">"Do not judge, or you too will be judged. For in the same way you judge others, you will be judged."</div>
 
 Kate had a complicated relationship with this one.
 
-She judged constantly — cataloguing faults with almost <span class="word" data-say="sye-en-tif-ik">scientific</span> <span class="word" data-say="pre-SIH-zhun">precision</span>. It was almost <span class="word" data-say="in-vol-un-tair-ee">involuntary</span> — she noticed when things were <span class="word" data-say="il-loj-ih-kul">illogical</span>, when people were wrong, when situations were <span class="word" data-say="in-eh-fish-ent">inefficient</span>. She <span class="word" data-say="kat-uh-loged">catalogued</span> Benson's faults with the thoroughness of a scientist.
+She judged constantly — cataloguing faults with almost <span class="word" data-say="sye-en-tif-ik" data-def="having to do with science and careful, organized thinking">scientific</span> <span class="word" data-say="pre-SIH-zhun" data-def="being very exact and careful, with no mistakes">precision</span>. It was almost <span class="word" data-say="in-vol-un-tair-ee" data-def="something your body or mind does without you deciding to do it">involuntary</span> — she noticed when things were <span class="word" data-say="il-loj-ih-kul" data-def="something that does not make sense or follow the rules of thinking">illogical</span>, when people were wrong, when situations were <span class="word" data-say="in-eh-fish-ent" data-def="doing something in a way that wastes time or effort">inefficient</span>. She <span class="word" data-say="kat-uh-loged" data-def="made a careful list of things, one by one">catalogued</span> Benson's faults with the thoroughness of a scientist.
 
 <em>He's too sensitive. He overreacts. He shouldn't have come into my room.</em>
 
@@ -3768,13 +3787,13 @@ But Jesus was asking a harder question.
 
 <em>By the standard you use for Benson — what standard do you want applied to you?</em>
 
-Did Kate want someone cataloguing her faults with the same precision? Her quickness to irritation? Her <span class="word" data-say="en-joy-ment">enjoyment</span> of his distress? Her habit of finding reasons to provoke him?
+Did Kate want someone cataloguing her faults with the same precision? Her quickness to irritation? Her <span class="word" data-say="en-joy-ment" data-def="the happy feeling you get from doing something you like">enjoyment</span> of his distress? Her habit of finding reasons to provoke him?
 
 <div class="bible-verse">"Why do you look at the speck of sawdust in your brother's eye, and pay no attention to the plank in your own?"</div>
 
 A speck. A plank.
 
-Kate was very smart. She understood this <span class="word" data-say="met-uh-for">metaphor</span> immediately and completely.
+Kate was very smart. She understood this <span class="word" data-say="met-uh-for" data-def="comparing two things to explain what something is like">metaphor</span> immediately and completely.
 
 She did not enjoy it.` },
   { title: 'The Golden Rule', text: `<div class="bible-verse">"Do to others what you would have them do to you."</div>
@@ -3783,17 +3802,17 @@ Simple. Seven words. The whole law summed up right there.
 
 Kate thought about it carefully.
 
-If Benson were older. If Benson were sharper. If Benson knew exactly where her tender places were — her self-doubt, her need to be right, her fear that she wasn't as brilliant as she <span class="word" data-say="preh-tended">pretended</span> — and he used that knowledge to take her apart, piece by piece, in the privacy of their home.
+If Benson were older. If Benson were sharper. If Benson knew exactly where her tender places were — her self-doubt, her need to be right, her fear that she wasn't as brilliant as she <span class="word" data-say="preh-tended" data-def="acted like something was true when it was not">pretended</span> — and he used that knowledge to take her apart, piece by piece, in the privacy of their home.
 
 Would she call it joking?
 
-Would she tell herself she was too <span class="word" data-say="sen-sih-tiv">sensitive</span>?
+Would she tell herself she was too <span class="word" data-say="sen-sih-tiv" data-def="having strong feelings that get hurt easily">sensitive</span>?
 
 Would she feel, in that split second before the explosion, that small look of pain that she had seen on Benson's face so many times?
 
 She sat with that thought for a long time.
 
-The Golden Rule wasn't <span class="word" data-say="kom-plih-kay-ted">complicated</span>.
+The Golden Rule wasn't <span class="word" data-say="kom-plih-kay-ted" data-def="having many parts that are hard to understand">complicated</span>.
 
 It was just hard.` },
   { title: 'Love Your Enemies', text: `<div class="bible-verse">"Love your enemies. Pray for those who hurt you."</div>
@@ -3806,13 +3825,13 @@ But then she stopped.
 
 The answer arrived quickly, honestly, and without much room for argument.
 
-She had been treating him like someone whose pain was entertaining. Like someone whose buttons were hers to push. Like someone whose <span class="word" data-say="dig-nih-tee">dignity</span> didn't quite matter as much as her amusement.
+She had been treating him like someone whose pain was entertaining. Like someone whose buttons were hers to push. Like someone whose <span class="word" data-say="dig-nih-tee" data-def="treating yourself and others with respect">dignity</span> didn't quite matter as much as her amusement.
 
 If a stranger treated her brother that way — she would be furious.
 
 She was the stranger.
 
-<em>Pray for those who hurt you.</em> But also — pray for yourself. Pray for the part of you that keeps choosing this. Not because you're evil. But because it's an <span class="word" data-say="in-gray-nd">ingrained</span> habit — and those need something stronger than <span class="word" data-say="wil-power">willpower</span> to break.
+<em>Pray for those who hurt you.</em> But also — pray for yourself. Pray for the part of you that keeps choosing this. Not because you're evil. But because it's an <span class="word" data-say="in-gray-nd" data-def="a habit or idea so deep it is hard to change">ingrained</span> habit — and those need something stronger than <span class="word" data-say="wil-power" data-def="the strength inside you to do hard things or stop bad habits">willpower</span> to break.
 
 <div class="bible-verse">"Be perfect, as your heavenly Father is perfect."</div>
 
@@ -3844,7 +3863,7 @@ Kate looked at the grass.
 <div class="bible-verse">"I know," said Jesus quietly. "That's why I'm here."</div>` },
   { title: 'The Next Afternoon', text: `The next afternoon, Benson walked into Kate's room without knocking.
 
-The irritation fired up instantly. <span class="word" data-say="aw-toh-mat-ik">Automatic</span>. Familiar.
+The irritation fired up instantly. <span class="word" data-say="aw-toh-mat-ik" data-def="happening on its own without you thinking about it">Automatic</span>. Familiar.
 
 She opened her mouth.
 
@@ -3856,7 +3875,7 @@ She took one breath.
 
 "Hey," she said instead.
 
-Benson stopped. He looked at her with the particular <span class="word" data-say="sus-pish-un">suspicion</span> of a seven-year-old who has been teased many times and has learned to wait for the other shoe to drop.
+Benson stopped. He looked at her with the particular <span class="word" data-say="sus-pish-un" data-def="a feeling that something might be wrong or that someone is not being honest">suspicion</span> of a seven-year-old who wasn't sure if Kate was being nice or setting a trap. Kate being nice usually meant something was about to happen. He was waiting for the trick. Like there was always a trick.
 
 "What do you want?" he said carefully.
 
@@ -3871,7 +3890,7 @@ They didn't fight. They didn't speak much. They just existed in the same space w
 It was, Kate decided, one of the better afternoons she could remember.` },
   { title: 'What Kate Knows Now', text: `Kate still gets irritated fast.
 
-She still thinks she's almost always right — and is sometimes <span class="word" data-say="as-tound-id">astounded</span> when she isn't — which is both her <span class="word" data-say="soo-per-power">superpower</span> and her greatest <span class="word" data-say="in-kon-veen-yence">inconvenience</span>.
+She still thinks she's almost always right — and is sometimes <span class="word" data-say="as-tound-id" data-def="completely surprised, almost hard to believe">astounded</span> when she isn't — which is both her <span class="word" data-say="soo-per-power" data-def="a very special ability that makes you stand out">superpower</span> and her greatest <span class="word" data-say="in-kon-veen-yence" data-def="something that causes a small problem or makes things harder">inconvenience</span>.
 
 She still catches herself finding reasons to provoke Benson on quiet days when nothing has happened.
 
@@ -3881,11 +3900,13 @@ That impulse — that small sharp thing that wants to poke and prod and watch hi
 
 It is a habit. And every habit can be replaced with a better one.
 
-<em>When the urge to poke comes — breathe. Remember. Ask.</em>
+<em>When the urge to poke comes:</em>
+
+<div class="prayer-bubble">🙏 Stop.<br>Take one breath.<br>And say quietly:<br><br><em>"God, please take this feeling away from me and fill me with love instead."</em><br><br>That's it. That's all. And watch what happens.</div>
 
 <div class="bible-verse">Blessed are the merciful, for they shall receive mercy.<br>Blessed are the peacemakers, for they shall be called children of God.<br>Do to others what you would have them do to you.</div>
 
-Kate is nine years old. She is <span class="word" data-say="in-tel-ih-jent">intelligent</span>, creative, and capable of <span class="word" data-say="ex-trawr-dih-nair-ee">extraordinary</span> kindness.
+Kate is nine years old. She is <span class="word" data-say="in-tel-ih-jent" data-def="quick at learning and understanding things">intelligent</span>, creative, and capable of <span class="word" data-say="ex-trawr-dih-nair-ee" data-def="far beyond what is normal — truly amazing">extraordinary</span> kindness.
 
 She is the salt of the earth.
 
@@ -3927,7 +3948,7 @@ That feeling of: <em>I did it again. Something is wrong with me.</em>
 
 He has a volcano inside him.
 
-Most of the time it is quiet. Most of the time Benson is sweet and funny and kind and he builds the most <span class="word" data-say="in-kred-ih-bul">incredible</span> Lego creations you have ever seen.
+Most of the time it is quiet. Most of the time Benson is sweet and funny and kind and he builds the most <span class="word" data-say="in-kred-ih-bul" data-def="so amazing it is hard to believe">incredible</span> Lego creations you have ever seen.
 
 But then something happens.
 
@@ -3935,7 +3956,7 @@ Kate sits too close at breakfast. Her leg touches his. Something fires up inside
 
 <div class="volcano-bubble">🌋 His eyes roll back. His head drops. A sound builds up in his chest like a teapot about to explode.<br><br><strong>"GET AWAY FROM ME."</strong></div>
 
-Or Kylie, who is two years old and means no harm at all, toddles over to his most <span class="word" data-say="deh-lih-kit">delicate</span> Lego creation — the one he spent forty-five minutes building — and knocks it over with one happy little hand.
+Or Kylie, who is two years old and means no harm at all, toddles over to his most <span class="word" data-say="deh-lih-kit" data-def="very carefully made and easy to break">delicate</span> Lego creation — the one he spent forty-five minutes building — and knocks it over with one happy little hand.
 
 And the volcano erupts.
 
@@ -4052,7 +4073,7 @@ And then something happened that he had not expected at all.
 
 The feeling actually went away.
 
-Not all at once. Like a tide going out — slowly, quietly, until the rumbling in his chest just... stopped.
+Not all at once. More like when you stub your toe really hard and it HURTS — and you're sure it will never stop hurting — but then, little by little, without you doing anything at all, it just... fades. Until it's completely gone.
 
 <div class="victory-bubble">🌟 The volcano went quiet.</div>
 
@@ -4095,8 +4116,10 @@ function changeBibleFont(dir){
   });
 }
 
-let bibleStory = null;  // 'kate_bible' or 'benson_bible'
+  // 'kate_bible' or 'benson_bible'
 let biblePageIdx = 0;
+
+let bibleStory = null;
 
 function startBibleStory(which){
   bibleStory = which;
