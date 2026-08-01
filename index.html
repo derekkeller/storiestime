@@ -468,6 +468,104 @@ body {
   background:#F3E5F5; border-radius:10px;
   padding:8px 10px;
 }
+
+/* ══ WORD CARDS MODAL (Benson Bible vocabulary review) ══ */
+#word-cards-modal {
+  position:fixed; inset:0;
+  z-index:9300;
+  display:none;
+  align-items:flex-end;
+}
+#word-cards-modal.open { display:flex; }
+#word-cards-backdrop {
+  position:absolute; inset:0;
+  background:rgba(0,0,0,.5);
+}
+#word-cards-panel {
+  position:relative;
+  background:#fff;
+  width:100%; max-width:640px;
+  margin:0 auto;
+  border-radius:24px 24px 0 0;
+  padding:20px 18px 32px;
+  max-height:82vh;
+  overflow-y:auto;
+  animation:slide-panel .3s ease;
+  z-index:1;
+}
+#word-cards-panel h2 {
+  font-family:'Fredoka One',cursive;
+  color:#B37A00;
+  font-size:1.3rem;
+  margin-bottom:4px;
+}
+#word-cards-panel .panel-sub {
+  font-size:.8rem; color:#888; margin-bottom:14px;
+}
+.wc-card {
+  margin-bottom:20px;
+}
+.wc-card-label {
+  font-family:'Fredoka One',cursive;
+  color:#888;
+  font-size:.85rem;
+  margin-bottom:8px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.wc-chip-row {
+  display:flex; flex-wrap:wrap; gap:10px;
+}
+.wc-chip {
+  background:#FFF8E1;
+  border:2px solid #F5C518;
+  border-radius:14px;
+  padding:10px 14px;
+  cursor:pointer;
+  min-width:110px;
+  flex:1 1 auto;
+  transition:background .15s ease;
+}
+.wc-chip:active { transform:translateY(1px); }
+.wc-chip.revealed {
+  background:#FFF3C4;
+}
+.wc-chip-word {
+  font-family:'Fredoka One',cursive;
+  font-size:1.05rem;
+  color:#2C1810;
+  text-align:center;
+}
+.wc-chip-reveal {
+  display:none;
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px dashed rgba(0,0,0,.15);
+}
+.wc-chip.revealed .wc-chip-reveal { display:block; }
+.wc-chip-say {
+  font-size:.82rem;
+  color:#1565C0;
+  font-weight:800;
+  margin-bottom:3px;
+  text-align:center;
+}
+.wc-chip-def {
+  font-size:.78rem;
+  color:#555;
+  text-align:center;
+  line-height:1.4;
+}
+#word-cards-close {
+  display:block; width:100%;
+  background:#F5C518; color:#2C1810;
+  border:none; border-radius:14px;
+  padding:14px; margin-top:6px;
+  font-family:'Fredoka One',cursive;
+  font-size:1.1rem; cursor:pointer;
+  border-bottom:4px solid #c9960a;
+}
+
 .fp-buttons { display:flex; gap:10px; justify-content:center; }
 .fp-btn {
   border:none; border-radius:14px;
@@ -1236,6 +1334,7 @@ body {
   <div id="bible-nav">
     <button class="bible-nav-btn prev hidden" id="bible-prev" onclick="biblePrevPage()">◀ Back</button>
     <button class="bible-nav-btn" id="bible-my-words" onclick="openDrawer()" style="background:var(--purple);color:#fff;border-bottom-color:#4A0080;font-size:.8rem;padding:8px 12px;">📚 My Words <span id="bible-word-count" style="background:#fff;color:var(--purple);border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;margin-left:4px;">0</span></button>
+    <button class="bible-nav-btn" id="bible-word-cards-btn" onclick="openWordCardsModal()" style="background:#F5C518;color:#2C1810;border-bottom-color:#c9960a;font-size:.8rem;padding:8px 12px;display:none;">📇 Word Cards</button>
     <button class="bible-nav-btn" id="bible-next" onclick="bibleNextPage()">Next ▶</button>
   </div>
 </div>
@@ -1377,6 +1476,17 @@ body {
     <div class="panel-sub">Tap any word in the story to save it here!</div>
     <div id="vocab-list"></div>
     <button id="drawer-close" onclick="closeDrawer()">Done Reading! ✅</button>
+  </div>
+</div>
+
+<!-- ══ WORD CARDS MODAL (Benson Bible vocab review) ══ -->
+<div id="word-cards-modal">
+  <div id="word-cards-backdrop" onclick="closeWordCardsModal()"></div>
+  <div id="word-cards-panel">
+    <h2>📇 Tricky Word Cards</h2>
+    <div class="panel-sub">Tap a word to hear how to say it and what it means!</div>
+    <div id="word-cards-list"></div>
+    <button id="word-cards-close" onclick="closeWordCardsModal()">Done Reviewing! ✅</button>
   </div>
 </div>
 
@@ -2672,6 +2782,68 @@ function flashAnswer(status) {
 }
 
 function flashSkip() { endFlash(); }
+
+// ── WORD CARDS (Benson Bible vocabulary review module) ──
+// Pulls every pre-tagged data-say/data-def word straight out of the
+// story's own page text, so the list always stays in sync with the story.
+function extractVocabFromPages(pages) {
+  const seen = new Set();
+  const words = [];
+  const re = /data-say="([^"]*)"\s+data-def="([^"]*)"[^>]*>([^<]+)</g;
+  pages.forEach(p => {
+    let m;
+    while ((m = re.exec(p.text)) !== null) {
+      const say = m[1], def = m[2], word = m[3].trim();
+      const key = word.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        words.push({ word, say, def });
+      }
+    }
+  });
+  return words;
+}
+
+let wordCardsList = [];
+function openWordCardsModal() {
+  const pages = bibleStory === 'kate_bible' ? kateBiblePages : bensonBiblePages;
+  wordCardsList = extractVocabFromPages(pages);
+  renderWordCards();
+  document.getElementById('word-cards-modal').classList.add('open');
+}
+function closeWordCardsModal() {
+  document.getElementById('word-cards-modal').classList.remove('open');
+}
+function renderWordCards() {
+  const el = document.getElementById('word-cards-list');
+  if (!wordCardsList.length) {
+    el.innerHTML = '<div class="vocab-empty">No tricky words tagged in this story yet!</div>';
+    return;
+  }
+  const chunkSize = 10;
+  let html = '';
+  for (let i = 0; i < wordCardsList.length; i += chunkSize) {
+    const chunk = wordCardsList.slice(i, i + chunkSize);
+    const cardNum = Math.floor(i / chunkSize) + 1;
+    html += '<div class="wc-card"><div class="wc-card-label">Card ' + cardNum + '</div><div class="wc-chip-row">' +
+      chunk.map((w, idx) => {
+        const wid = 'wc-' + i + '-' + idx;
+        return '<div class="wc-chip" id="' + wid + '" onclick="toggleWordChip(\'' + wid + '\')">' +
+          '<div class="wc-chip-word">' + w.word + '</div>' +
+          '<div class="wc-chip-reveal">' +
+            '<div class="wc-chip-say">🔊 ' + w.say + '</div>' +
+            '<div class="wc-chip-def">📖 ' + w.def + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div></div>';
+  }
+  el.innerHTML = html;
+}
+function toggleWordChip(id) {
+  const chip = document.getElementById(id);
+  if (chip) chip.classList.toggle('revealed');
+}
 
 function endFlash() {
   document.getElementById('flash-modal').classList.remove('open');
@@ -4129,6 +4301,7 @@ function startBibleStory(which){
   document.getElementById('bible-title').textContent = title;
   document.getElementById('bible-reader').classList.add('visible');
   document.getElementById('vocab-tab').style.display='none';
+  document.getElementById('bible-word-cards-btn').style.display = (which === 'benson_bible') ? '' : 'none';
   updateTabCount();
   renderBiblePage();
 }
