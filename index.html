@@ -474,56 +474,59 @@ body {
   position:fixed; inset:0;
   z-index:9300;
   display:none;
-  align-items:flex-end;
+  flex-direction:column;
+  background:#FFFDF5;
 }
 #word-cards-modal.open { display:flex; }
-#word-cards-backdrop {
-  position:absolute; inset:0;
-  background:rgba(0,0,0,.5);
+#word-cards-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 18px 12px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  flex-shrink:0;
 }
-#word-cards-panel {
-  position:relative;
-  background:#fff;
-  width:100%; max-width:640px;
-  margin:0 auto;
-  border-radius:24px 24px 0 0;
-  padding:20px 18px 32px;
-  max-height:82vh;
-  overflow-y:auto;
-  animation:slide-panel .3s ease;
-  z-index:1;
-}
-#word-cards-panel h2 {
+#word-cards-header h2 {
   font-family:'Fredoka One',cursive;
   color:#B37A00;
-  font-size:1.3rem;
-  margin-bottom:4px;
+  font-size:1.25rem;
 }
-#word-cards-panel .panel-sub {
-  font-size:.8rem; color:#888; margin-bottom:14px;
+#word-cards-header .panel-sub {
+  font-size:.78rem; color:#888; margin-top:2px;
 }
-.wc-card {
-  margin-bottom:20px;
+#word-cards-close-x {
+  background:#eee; border:none; border-radius:50%;
+  width:34px; height:34px; flex-shrink:0;
+  font-size:1.1rem; color:#555; cursor:pointer;
+  margin-left:12px;
 }
-.wc-card-label {
+#word-cards-body {
+  flex:1;
+  overflow-y:auto;
+  padding:20px 18px 10px;
+  display:flex;
+  flex-direction:column;
+}
+#word-cards-page-label {
   font-family:'Fredoka One',cursive;
   color:#888;
   font-size:.85rem;
-  margin-bottom:8px;
+  margin-bottom:12px;
   text-transform:uppercase;
   letter-spacing:1px;
+  text-align:center;
 }
 .wc-chip-row {
-  display:flex; flex-wrap:wrap; gap:10px;
+  display:flex; flex-wrap:wrap; gap:12px;
+  max-width:640px; margin:0 auto; width:100%;
+  align-content:flex-start;
 }
 .wc-chip {
   background:#FFF8E1;
   border:2px solid #F5C518;
   border-radius:14px;
-  padding:10px 14px;
+  padding:14px 16px;
   cursor:pointer;
-  min-width:110px;
-  flex:1 1 auto;
+  min-width:130px;
+  flex:1 1 calc(50% - 12px);
   transition:background .15s ease;
 }
 .wc-chip:active { transform:translateY(1px); }
@@ -532,7 +535,7 @@ body {
 }
 .wc-chip-word {
   font-family:'Fredoka One',cursive;
-  font-size:1.05rem;
+  font-size:1.15rem;
   color:#2C1810;
   text-align:center;
 }
@@ -544,26 +547,44 @@ body {
 }
 .wc-chip.revealed .wc-chip-reveal { display:block; }
 .wc-chip-say {
-  font-size:.82rem;
+  font-size:.85rem;
   color:#1565C0;
   font-weight:800;
   margin-bottom:3px;
   text-align:center;
 }
 .wc-chip-def {
-  font-size:.78rem;
+  font-size:.8rem;
   color:#555;
   text-align:center;
   line-height:1.4;
 }
-#word-cards-close {
-  display:block; width:100%;
+#word-cards-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px;
+  padding:12px 18px 20px;
+  border-top:1px solid rgba(0,0,0,.06);
+  flex-shrink:0;
+}
+#word-cards-dots {
+  display:flex; gap:8px; justify-content:center; flex:1;
+}
+.wc-dot {
+  width:10px; height:10px; border-radius:50%;
+  background:#eee; border:2px solid #F5C518;
+}
+.wc-dot.active { background:#F5C518; }
+.wc-nav-btn {
   background:#F5C518; color:#2C1810;
-  border:none; border-radius:14px;
-  padding:14px; margin-top:6px;
+  border:none; border-bottom:4px solid #c9960a;
+  border-radius:12px;
+  padding:12px 20px;
   font-family:'Fredoka One',cursive;
-  font-size:1.1rem; cursor:pointer;
-  border-bottom:4px solid #c9960a;
+  font-size:1rem; cursor:pointer;
+  white-space:nowrap;
+}
+.wc-nav-btn:disabled {
+  opacity:.35; cursor:default;
 }
 
 .fp-buttons { display:flex; gap:10px; justify-content:center; }
@@ -1481,12 +1502,21 @@ body {
 
 <!-- ══ WORD CARDS MODAL (Benson Bible vocab review) ══ -->
 <div id="word-cards-modal">
-  <div id="word-cards-backdrop" onclick="closeWordCardsModal()"></div>
-  <div id="word-cards-panel">
-    <h2>📇 Tricky Word Cards</h2>
-    <div class="panel-sub">Tap a word to hear how to say it and what it means!</div>
-    <div id="word-cards-list"></div>
-    <button id="word-cards-close" onclick="closeWordCardsModal()">Done Reviewing! ✅</button>
+  <div id="word-cards-header">
+    <div>
+      <h2>📇 Tricky Word Cards</h2>
+      <div class="panel-sub">Tap a word to hear how to say it and what it means!</div>
+    </div>
+    <button id="word-cards-close-x" onclick="closeWordCardsModal()">✕</button>
+  </div>
+  <div id="word-cards-body">
+    <div id="word-cards-page-label"></div>
+    <div class="wc-chip-row" id="word-cards-list"></div>
+  </div>
+  <div id="word-cards-footer">
+    <button class="wc-nav-btn" id="wc-prev-btn" onclick="wordCardsPrevPage()">◀ Back</button>
+    <div id="word-cards-dots"></div>
+    <button class="wc-nav-btn" id="wc-next-btn" onclick="wordCardsNextPage()">Next ▶</button>
   </div>
 </div>
 
@@ -2805,40 +2835,66 @@ function extractVocabFromPages(pages) {
 }
 
 let wordCardsList = [];
+let wordCardsPageIdx = 0;
+const WORD_CARDS_PER_PAGE = 10;
+
 function openWordCardsModal() {
   const pages = bibleStory === 'kate_bible' ? kateBiblePages : bensonBiblePages;
   wordCardsList = extractVocabFromPages(pages);
-  renderWordCards();
+  wordCardsPageIdx = 0;
+  renderWordCardsPage();
   document.getElementById('word-cards-modal').classList.add('open');
 }
 function closeWordCardsModal() {
   document.getElementById('word-cards-modal').classList.remove('open');
 }
-function renderWordCards() {
-  const el = document.getElementById('word-cards-list');
+function wordCardsTotalPages() {
+  return Math.max(1, Math.ceil(wordCardsList.length / WORD_CARDS_PER_PAGE));
+}
+function renderWordCardsPage() {
+  const listEl  = document.getElementById('word-cards-list');
+  const labelEl = document.getElementById('word-cards-page-label');
+  const dotsEl  = document.getElementById('word-cards-dots');
+  const prevBtn = document.getElementById('wc-prev-btn');
+  const nextBtn = document.getElementById('wc-next-btn');
+
   if (!wordCardsList.length) {
-    el.innerHTML = '<div class="vocab-empty">No tricky words tagged in this story yet!</div>';
+    labelEl.textContent = '';
+    listEl.innerHTML = '<div class="vocab-empty">No tricky words tagged in this story yet!</div>';
+    dotsEl.innerHTML = '';
+    prevBtn.disabled = true; nextBtn.disabled = true;
     return;
   }
-  const chunkSize = 10;
-  let html = '';
-  for (let i = 0; i < wordCardsList.length; i += chunkSize) {
-    const chunk = wordCardsList.slice(i, i + chunkSize);
-    const cardNum = Math.floor(i / chunkSize) + 1;
-    html += '<div class="wc-card"><div class="wc-card-label">Card ' + cardNum + '</div><div class="wc-chip-row">' +
-      chunk.map((w, idx) => {
-        const wid = 'wc-' + i + '-' + idx;
-        return '<div class="wc-chip" id="' + wid + '" onclick="toggleWordChip(\'' + wid + '\')">' +
-          '<div class="wc-chip-word">' + w.word + '</div>' +
-          '<div class="wc-chip-reveal">' +
-            '<div class="wc-chip-say">🔊 ' + w.say + '</div>' +
-            '<div class="wc-chip-def">📖 ' + w.def + '</div>' +
-          '</div>' +
-        '</div>';
-      }).join('') +
-    '</div></div>';
-  }
-  el.innerHTML = html;
+
+  const total = wordCardsTotalPages();
+  const start = wordCardsPageIdx * WORD_CARDS_PER_PAGE;
+  const chunk = wordCardsList.slice(start, start + WORD_CARDS_PER_PAGE);
+
+  labelEl.textContent = 'Page ' + (wordCardsPageIdx + 1) + ' of ' + total;
+
+  listEl.innerHTML = chunk.map((w, idx) => {
+    const wid = 'wc-' + wordCardsPageIdx + '-' + idx;
+    return '<div class="wc-chip" id="' + wid + '" onclick="toggleWordChip(\'' + wid + '\')">' +
+      '<div class="wc-chip-word">' + w.word + '</div>' +
+      '<div class="wc-chip-reveal">' +
+        '<div class="wc-chip-say">🔊 ' + w.say + '</div>' +
+        '<div class="wc-chip-def">📖 ' + w.def + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  dotsEl.innerHTML = Array.from({ length: total }, (_, i) =>
+    '<div class="wc-dot' + (i === wordCardsPageIdx ? ' active' : '') + '"></div>'
+  ).join('');
+
+  prevBtn.disabled = wordCardsPageIdx === 0;
+  nextBtn.disabled = wordCardsPageIdx === total - 1;
+}
+function wordCardsPrevPage() {
+  if (wordCardsPageIdx > 0) { wordCardsPageIdx--; renderWordCardsPage(); }
+}
+function wordCardsNextPage() {
+  if (wordCardsPageIdx < wordCardsTotalPages() - 1) { wordCardsPageIdx++; renderWordCardsPage(); }
 }
 function toggleWordChip(id) {
   const chip = document.getElementById(id);
@@ -4105,60 +4161,60 @@ Jesus sat down in the grass. No crown. No fancy chair. Just Jesus, sitting on a 
 
 A boy named Eli leaned over to Benson.
 
-<div class="eli-bubble">💬 "My dad told me what that means. It means the people who feel like they're not enough — too small, too angry, too broken — those are the ones God is closest to."</div>
+<div class="eli-bubble">💬 "My dad told me what that means. It means the people who feel like they're not enough — too small, too angry, too broken — those are the ones God is <span class="word" data-say="kloh-sest" data-def="nearest to something, with the least distance between">closest</span> to."</div>
 
 Benson got very quiet.
 
 He knew that feeling.
 
-The feeling after he screamed at Kate and couldn't stop. The feeling after he cried on the trampoline in front of everyone. The feeling after Kylie knocked over his Legos and he lost it completely.
+The feeling after he screamed at Kate and couldn't stop. The feeling after he cried on the trampoline in front of everyone. The feeling after Kylie knocked over his Legos and he lost it <span class="word" data-say="kum-pleet-lee" data-def="all the way, totally, with nothing left out">completely</span>.
 
 That feeling of: <em>I did it again. Something is wrong with me.</em>
 
-<div class="prayer-bubble">Jesus looked like he was talking straight to Benson.<br><br><em>Those people are not forgotten. They are blessed.</em></div>` },
+<div class="prayer-bubble">Jesus looked like he was talking straight to Benson.<br><br><em>Those people are not <span class="word" data-say="for-got-en" data-def="not remembered anymore">forgotten</span>. They are blessed.</em></div>` },
   { title: 'The Volcano Inside', text: `Here is something true about Benson.
 
 He has a volcano inside him.
 
-Most of the time it is quiet. Most of the time Benson is sweet and funny and kind and he builds the most <span class="word" data-say="in-kred-ih-bul" data-def="so amazing it is hard to believe">incredible</span> Lego creations you have ever seen.
+Most of the time it is quiet. Most of the time Benson is sweet and funny and kind and he builds the most <span class="word" data-say="in-kred-ih-bul" data-def="so amazing it is hard to <span class="word" data-say="bee-leev" data-def="to feel sure that something is true">believe</span>">incredible</span> Lego creations you have ever seen.
 
 But then something happens.
 
 Kate sits too close at breakfast. Her leg touches his. Something fires up inside Benson like a rocket.
 
-<div class="volcano-bubble">🌋 His eyes roll back. His head drops. A sound builds up in his chest like a teapot about to explode.<br><br><strong>"GET AWAY FROM ME."</strong></div>
+<div class="volcano-bubble">🌋 His eyes roll back. His head drops. A sound builds up in his chest like a teapot about to <span class="word" data-say="ex-plohd" data-def="to burst apart suddenly with a loud bang">explode</span>.<br><br><strong>"GET AWAY FROM ME."</strong></div>
 
-Or Kylie, who is two years old and means no harm at all, toddles over to his most <span class="word" data-say="deh-lih-kit" data-def="very carefully made and easy to break">delicate</span> Lego creation — the one he spent forty-five minutes building — and knocks it over with one happy little hand.
+Or Kylie, who is two years old and means no harm at all, toddles over to his most <span class="word" data-say="deh-lih-kit" data-def="very carefully made and easy to break">delicate</span> Lego <span class="word" data-say="kree-ay-shun" data-def="something that was made or built">creation</span> — the one he spent forty-five minutes building — and knocks it over with one happy little hand.
 
-And the volcano erupts.
+And the volcano <span class="word" data-say="ee-rupts" data-def="bursts out suddenly and forcefully, like a volcano">erupts</span>.
 
-<div class="volcano-bubble">⚡ Benson always knew, afterward, that the volcano made things worse. Not better. It <em>always</em> made things worse.</div>
+<div class="volcano-bubble">⚡ Benson always knew, <span class="word" data-say="af-ter-werd" data-def="at a later time, after something else happens">afterward</span>, that the volcano made things worse. Not better. It <em>always</em> made things worse.</div>
 
 <p>He just didn't know how to stop it.</p>` },
   { title: 'Leo on the Trampoline', text: `One time, Benson was jumping on the trampoline with his friends. They had a game. Each person got a turn. Everyone was waiting in line.
 
 A little boy named Leo — smaller than Benson, younger than Benson — cut right in front of him.
 
-The volcano fired up instantly.
+The volcano fired up <span class="word" data-say="in-stant-lee" data-def="right away, without any delay at all">instantly</span>.
 
-<div class="volcano-bubble">🌋 Benson erupted. He sat down right on the trampoline and cried. He crossed his arms. He refused to play.</div>
+<div class="volcano-bubble">🌋 Benson <span class="word" data-say="ee-rup-ted" data-def="burst out suddenly with strong force">erupted</span>. He sat down right on the trampoline and cried. He crossed his arms. He <span class="word" data-say="ree-fyoozd" data-def="said no and would not do something">refused</span> to play.</div>
 
 And while Benson sat there, Leo kept jumping. Kept playing. Kept laughing.
 
 And then — because he saw it was working — Leo did it again. And again.
 
-Every time Benson erupted, Leo smiled. Because Leo knew exactly which button to push.
+Every time Benson erupted, Leo smiled. Because Leo knew <span class="word" data-say="eg-zakt-lee" data-def="in a precise and correct way, with no mistakes">exactly</span> which button to push.
 
 Benson's dad watched all of this.
 
-Later that night, he sat next to Benson and said something quietly — something Benson never forgot:
+Later that night, he sat next to Benson and said something <span class="word" data-say="kwy-et-lee" data-def="in a soft, calm way without making noise">quietly</span> — something Benson never forgot:
 
-<div class="bible-verse">"Buddy. Leo was trying to steal your joy. And you handed it right to him."</div>
+<div class="bible-verse">"Buddy. Leo was trying to <span class="word" data-say="steel" data-def="to take something that does not belong to you">steal</span> your joy. And you handed it right to him."</div>
 
 <div class="closing-note">💭 Benson thought about that for a long time.</div>` },
   { title: 'Blessed Are the Meek', text: `Back on the hill, Jesus kept talking.
 
-<div class="bible-verse">"Blessed are the meek."</div>
+<div class="bible-verse">"Blessed are the <span class="word" data-say="meek" data-def="gentle and calm, but strong enough that you don't need to <span class="word" data-say="proov" data-def="to show with facts that something is true">prove</span> it">meek</span>."</div>
 
 Eli's eyes went wide.
 
@@ -4181,9 +4237,9 @@ But because Benson knew who he was. And Leo couldn't take that away.
 <div class="eli-bubble">💪 <em>Strong enough on the inside that nothing on the outside can knock you over.</em></div>` },
   { title: 'The Hardest Thing Jesus Said', text: `Then Jesus said the part that made everyone go quiet.
 
-<div class="bible-verse">"Love your enemies. Pray for the people who hurt you."</div>
+<div class="bible-verse">"Love your <span class="word" data-say="en-eh-meez" data-def="people who are against you or want to hurt you">enemies</span>. Pray for the people who hurt you."</div>
 
-<em>"That's impossible,"</em> Benson said out loud.
+<em>"That's <span class="word" data-say="im-poss-ih-bul" data-def="something that cannot be done, no matter how hard you try">impossible</span>,"</em> Benson said out loud.
 
 Jesus looked right at him.
 
@@ -4191,7 +4247,7 @@ Jesus looked right at him.
 
 Eli nodded slowly.
 
-<div class="eli-bubble">💬 "My dad says when he gets really angry, he closes his eyes and asks God to take the angry feeling and fill that space with love instead. He says it actually works."</div>
+<div class="eli-bubble">💬 "My dad says when he gets really angry, he closes his eyes and asks God to take the angry feeling and fill that space with love instead. He says it <span class="word" data-say="ak-shoo-uh-lee" data-def="really, in fact, truly">actually</span> works."</div>
 
 Benson thought about that.
 
@@ -4202,7 +4258,7 @@ Not fighting the volcano by himself. Asking God to come inside and change what w
 
 He looked out at everyone on the hill.
 
-<div class="bible-verse">"You are the light of the world. Don't hide your light. Let it shine."</div>
+<div class="bible-verse">"You are the light of the world. Don't hide your light. Let it <span class="word" data-say="shyn" data-def="to give off bright light">shine</span>."</div>
 
 Benson sat very still.
 
@@ -4216,16 +4272,16 @@ But he knew he couldn't do it alone.
 
 <div class="closing-note">✨ <em>Nobody can. That's the whole point.</em></div>
 
-He closed his eyes right there on the hillside.
+He closed his eyes right there on the <span class="word" data-say="hil-side" data-def="the sloped part of a hill">hillside</span>.
 
 <div class="prayer-bubble">🙏 "God. I have a volcano inside me. I don't want it anymore.<br>Please take the angry feeling when it comes.<br>Fill me with love instead.<br>Help me shine.<br>Amen."</div>
 
-Something felt different. Not fixed. Not perfect.
+Something felt different. Not fixed. Not <span class="word" data-say="per-fikt" data-def="without any mistakes at all">perfect</span>.
 
 But different. Like a door had been opened just a crack, and light was coming through.` },
   { title: 'The Next Morning', text: `The next morning at breakfast, Kate's leg touched Benson's under the table.
 
-The volcano started to rumble.
+The volcano started to <span class="word" data-say="rum-bul" data-def="a low, deep grumbling sound or feeling">rumble</span>.
 
 He felt it coming — the eye roll, the head drop, the sound building up in his chest.
 
@@ -4241,7 +4297,7 @@ Benson picked up his spoon and kept eating.
 
 He sat there very still for a moment. Waiting.
 
-And then something happened that he had not expected at all.
+And then something happened that he had not <span class="word" data-say="ek-spek-ted" data-def="thought that something would happen">expected</span> at all.
 
 The feeling actually went away.
 
@@ -4251,24 +4307,24 @@ Not all at once. More like when you stub your toe really hard and it HURTS — a
 
 Benson blinked. He could not believe it.
 
-<div class="eli-bubble">He had prayed seven words — and God had actually answered. Right there at the breakfast table. In front of the cereal bowls.</div>
+<div class="eli-bubble">He had <span class="word" data-say="prayd" data-def="talked to God, asking for help or saying thanks">prayed</span> seven words — and God had actually answered. Right there at the breakfast table. In front of the cereal bowls.</div>
 
 It wasn't magic. It was better than magic.
 
-It was like God's hand had reached right into his chest and gently turned the volcano off.
+It was like God's hand had reached right into his chest and <span class="word" data-say="jent-lee" data-def="in a soft and careful way">gently</span> turned the volcano off.
 
 It was the smallest thing in the world.
 
 It was also the biggest thing Benson had ever done.` },
   { title: 'What Benson Knows Now', text: `Benson still has a volcano inside him.
 
-It will probably rumble tomorrow. But now he knows something he didn't know before.
+It will <span class="word" data-say="prob-uh-blee" data-def="likely to happen, though not for certain">probably</span> rumble tomorrow. But now he knows something he didn't know before.
 
 He doesn't have to fight it alone.
 
 <div class="eli-bubble">When Leo pushes his buttons — <em>"God, take this feeling away from me."</em><br>When Kate explodes at him — <em>"God, take this feeling away from me."</em><br>When Kylie knocks over his Legos — <em>"God, take this feeling away from me."</em></div>
 
-<div class="bible-verse">Blessed are the peacemakers — for they shall be called children of God.</div>
+<div class="bible-verse">Blessed are the <span class="word" data-say="pees-may-kerz" data-def="people who help stop fights and bring calm">peacemakers</span> — for they shall be called children of God.</div>
 
 <div class="victory-bubble">🌟 Children of God. That's who Benson is.<br>Not a volcano. A light.</div>
 
