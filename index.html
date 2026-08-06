@@ -515,7 +515,7 @@ body {
   text-align:center;
 }
 .wc-chip-row {
-  display:flex; flex-wrap:wrap; gap:12px;
+  display:flex; flex-wrap:wrap; gap:10px;
   max-width:640px; margin:0 auto; width:100%;
   align-content:flex-start;
 }
@@ -523,21 +523,54 @@ body {
   background:#FFF8E1;
   border:2px solid #F5C518;
   border-radius:14px;
-  padding:14px 16px;
+  padding:14px 14px 12px;
   cursor:pointer;
-  min-width:130px;
-  flex:1 1 calc(50% - 12px);
+  min-width:100px;
+  flex:1 1 calc(33.333% - 10px);
+  position:relative;
   transition:background .15s ease;
 }
 .wc-chip:active { transform:translateY(1px); }
 .wc-chip.revealed {
   background:#FFF3C4;
 }
+.wc-chip.practice {
+  border-color:#7B1FA2;
+  background:#F5E9FB;
+}
+.wc-chip.practice.revealed {
+  background:#ECD6F7;
+}
+.wc-practice-tag {
+  font-size:.65rem;
+  font-weight:800;
+  color:#7B1FA2;
+  text-align:center;
+  margin-bottom:4px;
+  letter-spacing:.5px;
+}
+.wc-flag {
+  position:absolute;
+  top:4px; right:4px;
+  width:24px; height:24px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.85rem;
+  border-radius:50%;
+  background:rgba(255,255,255,.7);
+  cursor:pointer;
+  z-index:2;
+}
+.wc-flag.active {
+  background:transparent;
+  cursor:default;
+  opacity:.8;
+}
 .wc-chip-word {
   font-family:'Fredoka One',cursive;
-  font-size:1.15rem;
+  font-size:1.1rem;
   color:#2C1810;
   text-align:center;
+  padding-right:2px;
 }
 .wc-chip-reveal {
   display:none;
@@ -547,17 +580,11 @@ body {
 }
 .wc-chip.revealed .wc-chip-reveal { display:block; }
 .wc-chip-say {
-  font-size:.85rem;
+  font-size:.82rem;
   color:#1565C0;
   font-weight:800;
   margin-bottom:3px;
   text-align:center;
-}
-.wc-chip-def {
-  font-size:.8rem;
-  color:#555;
-  text-align:center;
-  line-height:1.4;
 }
 #word-cards-footer {
   display:flex; align-items:center; justify-content:space-between;
@@ -2820,7 +2847,33 @@ function flashSkip() { endFlash(); }
 // ── WORD CARDS (Benson Bible reading-practice module) ──
 // Benson isn't reviewing curated vocabulary — he needs practice with ANY
 // word in the story that's long or tricky to sound out, regardless of
-// whether it was hand-tagged. So we scan the raw story text directly.
+// whether it was hand-tagged. So we scan the raw story text directly,
+// then look up a hand-written phonetic spelling for accuracy (falling
+// back to a rough auto-split heuristic only if a word isn't in the list).
+const BENSON_PHONETICS = {
+  nobody:"noh-boh-dee", sitting:"sit-ing", smiling:"smy-ling", everyone:"ev-ree-wun",
+  every:"ev-ree", started:"star-ted", talking:"tawk-ing", changed:"chaynjd",
+  everything:"ev-ree-thing", blessed:"bles-ed", kingdom:"king-dum", closest:"kloh-sest",
+  feeling:"fee-ling", screamed:"skreemd", trampoline:"tram-puh-leen", knocked:"nokt",
+  completely:"kum-pleet-lee", something:"sum-thing", straight:"strayt", forgotten:"for-got-en",
+  volcano:"vol-kay-noh", inside:"in-side", incredible:"in-kred-ih-bul", creations:"kree-ay-shunz",
+  happens:"hap-enz", breakfast:"brek-fist", touches:"tuch-ez", explode:"ek-splohd",
+  toddles:"tod-ulz", delicate:"deh-lih-kit", creation:"kree-ay-shun", minutes:"min-its",
+  building:"bil-ding", afterward:"af-ter-werd", jumping:"jum-ping", friends:"frendz",
+  waiting:"way-ting", smaller:"smaw-ler", younger:"yung-ger", instantly:"in-stant-lee",
+  erupted:"ee-rup-ted", crossed:"krawst", refused:"ree-fyoozd", playing:"play-ing",
+  laughing:"laf-ing", because:"bee-kuz", working:"wer-king", exactly:"eg-zakt-lee",
+  watched:"wocht", quietly:"kwy-et-lee", thought:"thawt", buttons:"but-unz",
+  nothing:"nuth-ing", outside:"owt-side", enemies:"en-eh-meez", impossible:"im-poss-ih-bul",
+  alone:"uh-lohn", instead:"in-sted", actually:"ak-shoo-uh-lee", fighting:"fy-ting",
+  himself:"him-self", slammed:"slamd", hillside:"hil-side", anymore:"en-ee-mor",
+  different:"dif-er-ent", perfect:"per-fikt", opened:"oh-pend", through:"throo",
+  morning:"mor-ning", touched:"tucht", looking:"luk-ing", happened:"hap-end",
+  expected:"ek-spek-ted", hurting:"her-ting", without:"with-owt", anything:"en-ee-thing",
+  blinked:"blinkt", believe:"bee-leev", answered:"an-serd", reached:"reechd",
+  biggest:"big-est", probably:"prob-uh-blee", tomorrow:"tuh-mor-oh", before:"bee-for",
+  explodes:"ek-splohdz", peacemakers:"pees-may-kerz", children:"chil-drun", starting:"star-ting"
+};
 function countSyllables(word) {
   const w = word.toLowerCase().replace(/[^a-z]/g, '');
   if (!w) return 0;
@@ -2833,7 +2886,7 @@ function phoneticSplit(word) {
   return (syl && syl.length > 1) ? syl.join('-') : w;
 }
 const WC_PROPER_NOUNS = new Set(['benson','kate','kylie','leo','eli','jesus','god']);
-function extractChallengingWords(pages) {
+function extractChallengingWords(pages, phoneticsDict) {
   const seen = new Set();
   const words = [];
   pages.forEach(p => {
@@ -2852,7 +2905,8 @@ function extractChallengingWords(pages) {
       const multiSyllable = countSyllables(clean) >= 3;
       if (long || multiSyllable) {
         seen.add(key);
-        words.push({ word: key, say: phoneticSplit(clean) });
+        const say = (phoneticsDict && phoneticsDict[key]) || phoneticSplit(clean);
+        words.push({ word: key, say });
       }
     });
   });
@@ -2869,12 +2923,16 @@ function shuffleArray(arr) {
 
 let wordCardsList = [];
 let wordCardsPageIdx = 0;
-const WORD_CARDS_PER_PAGE = 10;
+const WORD_CARDS_PER_PAGE = 14;
+const WC_CHALLENGE_REPEATS = 4; // how many extra times a flagged word reappears
+let wordChallengeActive = new Set(); // words currently scheduled for repeat practice
 
 function openWordCardsModal() {
   const pages = bibleStory === 'kate_bible' ? kateBiblePages : bensonBiblePages;
-  wordCardsList = shuffleArray(extractChallengingWords(pages));
+  const dict = bibleStory === 'kate_bible' ? null : BENSON_PHONETICS;
+  wordCardsList = shuffleArray(extractChallengingWords(pages, dict));
   wordCardsPageIdx = 0;
+  wordChallengeActive = new Set();
   renderWordCardsPage();
   document.getElementById('word-cards-modal').classList.add('open');
 }
@@ -2906,8 +2964,16 @@ function renderWordCardsPage() {
   labelEl.textContent = 'Page ' + (wordCardsPageIdx + 1) + ' of ' + total;
 
   listEl.innerHTML = chunk.map((w, idx) => {
-    const wid = 'wc-' + wordCardsPageIdx + '-' + idx;
-    return '<div class="wc-chip" id="' + wid + '" onclick="toggleWordChip(\'' + wid + '\')">' +
+    const absIdx = start + idx;
+    const wid = 'wc-' + absIdx;
+    const isPractice = !!w.challenge;
+    const isActive = wordChallengeActive.has(w.word);
+    const flagHtml = isActive
+      ? '<div class="wc-flag active" title="Practicing this word">🔁</div>'
+      : '<div class="wc-flag" onclick="event.stopPropagation(); flagChallengeWord(\'' + w.word + '\', \'' + w.say + '\', ' + absIdx + ')" title="Struggled with this word? Tap to add extra practice.">🚩</div>';
+    return '<div class="wc-chip' + (isPractice ? ' practice' : '') + '" id="' + wid + '" onclick="toggleWordChip(\'' + wid + '\')">' +
+      flagHtml +
+      (isPractice ? '<div class="wc-practice-tag">🔁 Practice</div>' : '') +
       '<div class="wc-chip-word">' + w.word + '</div>' +
       '<div class="wc-chip-reveal">' +
         '<div class="wc-chip-say">🔊 ' + w.say + '</div>' +
@@ -2931,6 +2997,29 @@ function wordCardsNextPage() {
 function toggleWordChip(id) {
   const chip = document.getElementById(id);
   if (chip) chip.classList.toggle('revealed');
+}
+// Struggled with a word? Sprinkle it back into the remaining pages so
+// Benson keeps running into it organically as he flips through the rest
+// of the deck — a lightweight, session-only spaced-repetition nudge.
+function flagChallengeWord(word, say, fromAbsIdx) {
+  if (wordChallengeActive.has(word)) return; // already scheduled — don't spam
+  wordChallengeActive.add(word);
+
+  const remaining = wordCardsList.length - fromAbsIdx - 1;
+  if (remaining <= 0) { renderWordCardsPage(); return; }
+
+  const fractions = [0.22, 0.48, 0.74, 0.97];
+  const targets = Array.from(new Set(
+    fractions.slice(0, WC_CHALLENGE_REPEATS).map(f =>
+      Math.min(wordCardsList.length, fromAbsIdx + 1 + Math.floor(remaining * f))
+    )
+  )).sort((a, b) => b - a); // insert farthest-first so earlier indices stay valid
+
+  targets.forEach(pos => {
+    wordCardsList.splice(pos, 0, { word, say, challenge: true });
+  });
+
+  renderWordCardsPage();
 }
 
 
