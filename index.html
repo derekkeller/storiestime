@@ -30,11 +30,13 @@ body {
 
 /* ══ ARCADE BANNER ══ */
 #arcade-wrap {
+  display:none;
   background: linear-gradient(180deg,#1a1a2e 0%, #16213e 100%);
   border-bottom: 5px solid var(--yellow);
   padding: 6px 10px 0;
   user-select:none;
 }
+#arcade-wrap.visible { display:block; }
 #arcade-title {
   font-family:'Fredoka One',cursive;
   color: var(--yellow);
@@ -310,6 +312,7 @@ body {
 
 /* ══ FLOATING BOOKMARK TAB ══ */
 #vocab-tab {
+  display:none;
   position:fixed;
   bottom:24px; right:16px;
   background:var(--purple);
@@ -515,7 +518,7 @@ body {
   text-align:center;
 }
 .wc-chip-row {
-  display:flex; flex-wrap:wrap; gap:10px;
+  display:flex; flex-wrap:wrap; gap:12px;
   max-width:640px; margin:0 auto; width:100%;
   align-content:flex-start;
 }
@@ -523,10 +526,10 @@ body {
   background:#FFF8E1;
   border:2px solid #F5C518;
   border-radius:14px;
-  padding:14px 14px 12px;
+  padding:16px 16px 14px;
   cursor:pointer;
-  min-width:100px;
-  flex:1 1 calc(33.333% - 10px);
+  min-width:120px;
+  flex:1 1 calc(50% - 12px);
   position:relative;
   transition:background .15s ease;
 }
@@ -541,51 +544,50 @@ body {
 .wc-chip.practice.revealed {
   background:#ECD6F7;
 }
-.wc-practice-tag {
-  font-size:.65rem;
-  font-weight:800;
-  color:#7B1FA2;
-  text-align:center;
-  margin-bottom:4px;
-  letter-spacing:.5px;
-}
-.wc-flag {
+.wc-badge {
   position:absolute;
-  top:4px; right:4px;
+  top:6px; right:6px;
   width:24px; height:24px;
   display:flex; align-items:center; justify-content:center;
   font-size:.85rem;
   border-radius:50%;
-  background:rgba(255,255,255,.7);
-  cursor:pointer;
+  background:rgba(123,31,162,.12);
   z-index:2;
-}
-.wc-flag.active {
-  background:transparent;
-  cursor:default;
-  opacity:.8;
 }
 .wc-chip-word {
   font-family:'Fredoka One',cursive;
-  font-size:1.1rem;
+  font-size:1.2rem;
   color:#2C1810;
   text-align:center;
   padding-right:2px;
 }
 .wc-chip-reveal {
   display:none;
-  margin-top:8px;
-  padding-top:8px;
+  margin-top:10px;
+  padding-top:10px;
   border-top:1px dashed rgba(0,0,0,.15);
 }
 .wc-chip.revealed .wc-chip-reveal { display:block; }
 .wc-chip-say {
-  font-size:.82rem;
+  font-size:.9rem;
   color:#1565C0;
   font-weight:800;
-  margin-bottom:3px;
+  margin-bottom:8px;
   text-align:center;
 }
+.wc-replay-btn {
+  display:block;
+  width:100%;
+  background:#fff;
+  border:2px solid #7B1FA2;
+  color:#7B1FA2;
+  border-radius:10px;
+  padding:7px 8px;
+  font-family:'Fredoka One',cursive;
+  font-size:.78rem;
+  cursor:pointer;
+}
+.wc-replay-btn:active { transform:translateY(1px); }
 #word-cards-footer {
   display:flex; align-items:center; justify-content:space-between;
   gap:10px;
@@ -1393,26 +1395,26 @@ body {
   <h1>📚 Choose Your Story!</h1>
   <div class="sel-sub">Pick a reader — the adventure begins! 🎮</div>
   <div class="sel-section-label">📖 Adventure Stories</div>
-  <button type="button" class="story-card-btn" onclick="selectStory('benson')" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='';selectStory('benson')">
+  <button type="button" class="story-card-btn" onclick="selectStory('benson')" ontouchstart="scTouchStart(event)" ontouchmove="scTouchMove(event)" ontouchend="scTouchEnd(event,'benson')">
     <span class="sc-emoji">💨</span>
     <span class="sc-title">Farty Fred</span>
     <span class="sc-grade">2nd Grade · Benson</span>
     <div class="sc-desc">Fred has a tiny problem — his bottom makes VERY loud noises at the worst possible times. Survive school, earn fireballs!</div>
   </button>
-  <button type="button" class="story-card-btn" onclick="selectStory('kate')" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='';selectStory('kate')">
+  <button type="button" class="story-card-btn" onclick="selectStory('kate')" ontouchstart="scTouchStart(event)" ontouchmove="scTouchMove(event)" ontouchend="scTouchEnd(event,'kate')">
     <span class="sc-emoji">👑</span>
     <span class="sc-title">Kate Is Always Right</span>
     <span class="sc-grade">4th Grade · Kate</span>
     <div class="sc-desc">Kate is nine, brilliant, and never wrong. Her brother Benson is a menace. Baby Kylie is chaos. This is their story.</div>
   </button>
   <div class="sel-section-label" style="margin-top:12px;">🙏 Bible Stories</div>
-  <button type="button" class="story-card-btn bible-card" onclick="selectStory('benson_bible')" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='';selectStory('benson_bible')">
+  <button type="button" class="story-card-btn bible-card" onclick="selectStory('benson_bible')" ontouchstart="scTouchStart(event)" ontouchmove="scTouchMove(event)" ontouchend="scTouchEnd(event,'benson_bible')">
     <span class="sc-emoji">🌄</span>
     <span class="sc-title">Benson Bible</span>
     <span class="sc-grade">2nd Grade · Benson · The Sermon on the Mount</span>
     <div class="sc-desc">A volcano inside. A hillside teaching. What Jesus said about anger, bullying, and being a light — just for Benson.</div>
   </button>
-  <button type="button" class="story-card-btn bible-card" onclick="selectStory('kate_bible')" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='';selectStory('kate_bible')">
+  <button type="button" class="story-card-btn bible-card" onclick="selectStory('kate_bible')" ontouchstart="scTouchStart(event)" ontouchmove="scTouchMove(event)" ontouchend="scTouchEnd(event,'kate_bible')">
     <span class="sc-emoji">🌅</span>
     <span class="sc-title">Kate Bible</span>
     <span class="sc-grade">4th Grade · Kate · The Sermon on the Mount</span>
@@ -2966,17 +2968,22 @@ function renderWordCardsPage() {
   listEl.innerHTML = chunk.map((w, idx) => {
     const absIdx = start + idx;
     const wid = 'wc-' + absIdx;
-    const isPractice = !!w.challenge;
-    const isActive = wordChallengeActive.has(w.word);
-    const flagHtml = isActive
-      ? '<div class="wc-flag active" title="Practicing this word">🔁</div>'
-      : '<div class="wc-flag" onclick="event.stopPropagation(); flagChallengeWord(\'' + w.word + '\', \'' + w.say + '\', ' + absIdx + ')" title="Struggled with this word? Tap to add extra practice.">🚩</div>';
+    const isPractice = !!w.challenge;       // this specific card is a scheduled repeat
+    const isActive = wordChallengeActive.has(w.word); // this word has been engaged for practice
+
+    // Persistent top-right badge once a word has been engaged — no icon at all beforehand.
+    const badgeHtml = isActive ? '<div class="wc-badge" title="Practicing this word">🔁</div>' : '';
+
+    // Replay button appears under the phonetic spelling, only before it's been engaged.
+    const replayBtnHtml = isActive ? '' :
+      '<button class="wc-replay-btn" onclick="event.stopPropagation(); engageChallengeWord(\'' + w.word + '\', \'' + w.say + '\', ' + absIdx + ')">🔁 Practice this word</button>';
+
     return '<div class="wc-chip' + (isPractice ? ' practice' : '') + '" id="' + wid + '" onclick="toggleWordChip(\'' + wid + '\')">' +
-      flagHtml +
-      (isPractice ? '<div class="wc-practice-tag">🔁 Practice</div>' : '') +
+      badgeHtml +
       '<div class="wc-chip-word">' + w.word + '</div>' +
       '<div class="wc-chip-reveal">' +
         '<div class="wc-chip-say">🔊 ' + w.say + '</div>' +
+        replayBtnHtml +
       '</div>' +
     '</div>';
   }).join('');
@@ -3001,23 +3008,23 @@ function toggleWordChip(id) {
 // Struggled with a word? Sprinkle it back into the remaining pages so
 // Benson keeps running into it organically as he flips through the rest
 // of the deck — a lightweight, session-only spaced-repetition nudge.
-function flagChallengeWord(word, say, fromAbsIdx) {
+function engageChallengeWord(word, say, fromAbsIdx) {
   if (wordChallengeActive.has(word)) return; // already scheduled — don't spam
   wordChallengeActive.add(word);
 
   const remaining = wordCardsList.length - fromAbsIdx - 1;
-  if (remaining <= 0) { renderWordCardsPage(); return; }
+  if (remaining > 0) {
+    const fractions = [0.22, 0.48, 0.74, 0.97];
+    const targets = Array.from(new Set(
+      fractions.slice(0, WC_CHALLENGE_REPEATS).map(f =>
+        Math.min(wordCardsList.length, fromAbsIdx + 1 + Math.floor(remaining * f))
+      )
+    )).sort((a, b) => b - a); // insert farthest-first so earlier indices stay valid
 
-  const fractions = [0.22, 0.48, 0.74, 0.97];
-  const targets = Array.from(new Set(
-    fractions.slice(0, WC_CHALLENGE_REPEATS).map(f =>
-      Math.min(wordCardsList.length, fromAbsIdx + 1 + Math.floor(remaining * f))
-    )
-  )).sort((a, b) => b - a); // insert farthest-first so earlier indices stay valid
-
-  targets.forEach(pos => {
-    wordCardsList.splice(pos, 0, { word, say, challenge: true });
-  });
+    targets.forEach(pos => {
+      wordCardsList.splice(pos, 0, { word, say, challenge: true });
+    });
+  }
 
   renderWordCardsPage();
 }
@@ -3958,6 +3965,32 @@ document.head.appendChild(ks);
 
 // ── START EVERYTHING ONCE DOM IS READY ──
 let storySelectLock = false;
+// Story-card buttons: only treat a touch as a tap if the finger didn't
+// move much — otherwise it was a scroll gesture and shouldn't select a story.
+let scTouchStartX = 0, scTouchStartY = 0, scTouchCanceled = false;
+const SC_MOVE_THRESHOLD = 12;
+function scTouchStart(e){
+  const t = e.touches[0];
+  scTouchStartX = t.clientX;
+  scTouchStartY = t.clientY;
+  scTouchCanceled = false;
+  e.currentTarget.style.transform = 'scale(.97)';
+}
+function scTouchMove(e){
+  if (scTouchCanceled) return;
+  const t = e.touches[0];
+  const dx = Math.abs(t.clientX - scTouchStartX);
+  const dy = Math.abs(t.clientY - scTouchStartY);
+  if (dx > SC_MOVE_THRESHOLD || dy > SC_MOVE_THRESHOLD) {
+    scTouchCanceled = true;
+    e.currentTarget.style.transform = '';
+  }
+}
+function scTouchEnd(e, which){
+  e.currentTarget.style.transform = '';
+  if (!scTouchCanceled) selectStory(which);
+}
+
 function selectStory(which){
   if(storySelectLock) return;
   storySelectLock = true;
@@ -3974,6 +4007,8 @@ function selectStory(which){
   activeStory = which;
   const sel = document.getElementById('story-selector');
   if(sel) sel.style.display='none';
+  document.getElementById('arcade-wrap').classList.add('visible');
+  document.getElementById('vocab-tab').style.display = '';
   earned.length=0;
   vocabList=[];
   updateTabCount();
@@ -4486,7 +4521,7 @@ function startBibleStory(which){
 
 function exitBibleStory(){
   document.getElementById('bible-reader').classList.remove('visible');
-  document.getElementById('vocab-tab').style.display='';
+  document.getElementById('vocab-tab').style.display='none';
   // Show story selector
   document.getElementById('story-selector').style.display = 'flex';
   bibleStory = null;
