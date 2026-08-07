@@ -1231,6 +1231,26 @@ body {
   font-size:.8rem; padding:5px 10px;
   cursor:pointer;
 }
+/* Version toggle — Benson Bible only */
+#bible-version-toggle {
+  display:flex; justify-content:center; gap:6px;
+  padding:6px 0 2px;
+  background:linear-gradient(135deg,#1a1a2e,#2d1b69);
+  flex-shrink:0;
+}
+.bv-btn {
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:20px; color:rgba(255,255,255,.65);
+  font-family:'Fredoka One',cursive;
+  font-size:.72rem; padding:5px 14px;
+  cursor:pointer;
+}
+.bv-btn.active {
+  background:var(--yellow);
+  color:#2C1810;
+  border-color:var(--yellow);
+}
 /* Progress dots */
 #bible-dots {
   display:flex; justify-content:center;
@@ -1375,6 +1395,10 @@ body {
       <button class="bible-font-btn" onclick="changeBibleFont(-1)" title="Smaller">A−</button>
       <button class="bible-font-btn" onclick="changeBibleFont(1)" title="Larger">A+</button>
     </div>
+  </div>
+  <div id="bible-version-toggle" style="display:none;">
+    <button id="bible-version-a-btn" class="bv-btn active" onclick="switchBibleVersion('A')">Version A</button>
+    <button id="bible-version-b-btn" class="bv-btn" onclick="switchBibleVersion('B')">Version B</button>
   </div>
   <div id="bible-dots"></div>
   <div id="bible-text-area">
@@ -2874,7 +2898,26 @@ const BENSON_PHONETICS = {
   expected:"ik-SPEK-did", hurting:"HER-ting", without:"with-OWT", anything:"EN-ee-thing",
   blinked:"BLINGKT", believe:"bih-LEEV", answered:"AN-serd", reached:"REECHT",
   biggest:"BIG-ist", probably:"PRAH-buh-blee", tomorrow:"tuh-MOR-oh", before:"bih-FOR",
-  explodes:"ik-SPLOHDZ", peacemakers:"PEES-may-kerz", children:"CHIL-drin", starting:"STAHR-ting"
+  explodes:"ik-SPLOHDZ", peacemakers:"PEES-may-kerz", children:"CHIL-drin", starting:"STAHR-ting",
+  // Added for Version B (reworded story)
+  ordinary:"OR-din-air-ee", afternoon:"af-ter-NOON", climbed:"KLYMD", finally:"FY-nuh-lee",
+  special:"SPESH-ul", grinning:"GRIH-ning", mattered:"MAT-erd", explained:"ik-SPLAYND",
+  measure:"MEZH-er", toppled:"TAH-puld", control:"kun-TROHL", yelling:"YEL-ing",
+  speaking:"SPEE-king", brushes:"BRUH-shiz", suddenly:"SUH-din-lee", ignites:"ig-NYTS",
+  whistle:"WISS-ul", barely:"BAIR-lee", meaning:"MEE-ning", wandering:"WAHN-der-ing",
+  careful:"KAIR-ful", flattening:"FLAT-en-ing", realized:"REE-uh-lyzd", bouncing:"BOWN-sing",
+  patiently:"PAY-shint-lee", plopped:"PLAHPT", meanwhile:"MEEN-wyle", realizing:"REE-uh-ly-zing",
+  grinned:"GRIND", watching:"WAH-ching", beside:"bih-SYDE", anyone:"EN-ee-wun",
+  thinking:"THING-king", deserved:"dih-ZERVD", already:"awl-RED-ee", blurted:"BLER-tid",
+  whenever:"wen-EV-er", supposed:"suh-POHZD", slamming:"SLAM-ing", screaming:"SKREE-ming",
+  scattered:"SKAT-erd", manage:"MAN-ij", shifted:"SHIF-tid", cracked:"KRAKT",
+  brushed:"BRUHSHT", against:"uh-GENST", dropped:"DRAHPT", pressure:"PRESH-er",
+  glancing:"GLAN-sing", noticed:"NOH-tist", touching:"TUH-ching", stubbing:"STUH-bing",
+  certain:"SER-tin", forever:"for-EV-er", believing:"bih-LEE-ving", somehow:"SUM-how",
+  switched:"SWICHT", carries:"KAIR-eez", however:"how-EV-er", perfectly:"PER-fikt-lee",
+  amazing:"uh-MAY-zing", sometimes:"SUM-tymz", wanders:"WAHN-derz",
+  someone:"SUM-wun", complains:"kum-PLAYNZ", solutions:"suh-LOO-shunz", hearing:"HEER-ing", finished:"FIH-nisht",
+  complain:"kum-PLAYN"
 };
 function countSyllables(word) {
   const w = word.toLowerCase().replace(/[^a-z]/g, '');
@@ -2930,7 +2973,7 @@ const WC_CHALLENGE_REPEATS = 4; // how many extra times a flagged word reappears
 let wordChallengeActive = new Set(); // words currently scheduled for repeat practice
 
 function openWordCardsModal() {
-  const pages = bibleStory === 'kate_bible' ? kateBiblePages : bensonBiblePages;
+  const pages = bibleStory === 'kate_bible' ? kateBiblePages : activeBensonBiblePages();
   const dict = bibleStory === 'kate_bible' ? null : BENSON_PHONETICS;
   wordCardsList = shuffleArray(extractChallengingWords(pages, dict));
   wordCardsPageIdx = 0;
@@ -4364,6 +4407,8 @@ Every time Benson erupted, Leo smiled. Because Leo knew exactly which button to 
 
 Benson's dad watched all of this.
 
+There was a bigger boy playing that day too, named Rudra. Rudra thought what Leo did was mean. But he'd also noticed that Benson was easy to tease — quick to cry, and not always easy to play with. Before they left, Rudra told Benson's dad, "We really like playing with Benson. We just wish he'd whine and complain less, and go with the flow more."
+
 Later that night, he sat next to Benson and said something quietly — something Benson never forgot:
 
 <div class="bible-verse">"Buddy. Leo was trying to steal your joy. And you handed it right to him."</div>
@@ -4488,7 +4533,200 @@ He doesn't have to fight it alone.
 <div class="closing-note">💛 <em>Next time you feel the volcano starting — close your eyes, take one breath, and say:<br><br>"God. Take this feeling away from me. Fill me with love instead."<br><br>You don't have to be perfect. You just have to try.</em></div>` }
 ];
 
+// ══ VERSION B — same story, same teaching, reworded sentence structure
+// and vocabulary so Benson has to actually read instead of reciting from
+// memory. Prayer wording is deliberately mixed between the original line
+// and a new alternative across the two versions — see page 9, which turns
+// that into an explicit lesson that the exact words don't matter.
+const bensonBiblePagesB = [
+  { title: 'The Hill', text: `One day, word spread that Jesus was nearby. A huge crowd walked up a grassy hill just to see him.
 
+Nobody had to ask twice. They simply went.
+
+Benson went too.
+
+Jesus sat down in the grass. There was no throne. There was no special seat. He just sat there, grinning at everyone like every one of them mattered to him.
+
+<div class="bible-verse">"Then, at last, he opened his mouth to speak."</div>
+
+<div class="closing-note">📖 That day would never feel quite the same again.</div>` },
+  { title: 'The Boy Who Felt Like He Wasn\'t Enough', text: `Jesus looked out at the crowd and said:
+
+<div class="bible-verse">"Blessed are the poor in spirit — for theirs is the kingdom of heaven."</div>
+
+A boy named Sam leaned toward Benson.
+
+<div class="eli-bubble">💬 "My dad explained this one to me. It's about kids who feel like they're not good enough — too small, too angry, too broken. Those are the kids God stays closest to."</div>
+
+Benson went very quiet.
+
+He knew that feeling well.
+
+The feeling from crying on the trampoline while everyone watched. The feeling after Kylie knocked over his Lego tower and he lost control. The feeling after yelling at Kate and not being able to stop.
+
+That same thought again: <em>Not again. Why do I keep doing this?</em>
+
+<div class="prayer-bubble">Jesus seemed to be talking straight to Benson.<br><br><em>Those people are never forgotten. They are blessed.</em></div>` },
+  { title: 'The Volcano Inside', text: `Here's something true about Benson. There's a volcano living inside him.
+
+Most days it stays quiet. Most days Benson is silly and kind. He builds Lego creations so amazing you wouldn't believe it.
+
+But sometimes, something sets it off.
+
+Maybe Kate sits too close at breakfast. Her leg touches his. Something fires up inside Benson like a rocket.
+
+<div class="volcano-bubble">🌋 His eyes roll back. His head drops. Something builds in his chest like a kettle about to blow.<br><br><strong>"GET AWAY FROM ME."</strong></div>
+
+Or maybe it's Kylie. She's only two. She means no harm at all. She wanders over to his best Lego build — the one that took him forty-five minutes to make — and knocks it flat with one happy little hand.
+
+And just like that, the volcano blows.
+
+<div class="volcano-bubble">⚡ Benson always knew, afterward, that the volcano never helped. It only made things worse. Every single time.</div>
+
+<p>He just didn't know how to stop it.</p>` },
+  { title: 'Leo on the Trampoline', text: `One day, Benson was bouncing on the trampoline with his friends. They had a game. Everyone was waiting for a turn.
+
+A boy named Leo — younger than Benson, smaller than Benson — cut right in front of him.
+
+The volcano lit up right away.
+
+<div class="volcano-bubble">🌋 Benson erupted. He plopped down on the trampoline and cried. He crossed his arms. He wouldn't play anymore.</div>
+
+But Leo just kept bouncing. Kept playing. Kept laughing.
+
+Leo saw it was working, so he did it again. And again.
+
+Every time Benson erupted, Leo grinned. Leo knew exactly which buttons to press.
+
+Benson's dad watched the whole thing.
+
+There was a bigger boy playing that day too, named Rudra. Rudra thought what Leo did was mean. But he'd also noticed that Benson was easy to tease — quick to cry, and not always easy to play with. Before they left, Rudra told Benson's dad, "We really like playing with Benson. We just wish he'd whine and complain less, and go with the flow more."
+
+That night, he sat next to Benson and quietly said something Benson would never forget:
+
+<div class="bible-verse">"Buddy. Leo was trying to steal your joy. And you handed it right to him."</div>
+
+<div class="closing-note">💭 Benson sat with that thought for a long, long time.</div>` },
+  { title: 'Blessed Are the Meek', text: `Back on the hill, Jesus kept talking.
+
+<div class="bible-verse">"Blessed are the meek."</div>
+
+Sam's eyes lit up.
+
+<div class="eli-bubble">💬 "My uncle told me about this one. Meek doesn't mean weak. It means you're so strong inside that you don't need to prove it to anyone."</div>
+
+Benson found himself thinking about Leo again.
+
+Leo had pushed his buttons because those buttons were so easy to push.
+
+But what if they weren't easy anymore?
+
+What if, the moment Leo cut in line, Benson had just... kept bouncing?
+
+Not because Leo was right. Not because it didn't sting.
+
+But because Benson knew exactly who he was. And nothing Leo did could take that away.
+
+<div class="bible-verse">Blessed are the meek.</div>
+
+<div class="eli-bubble">💪 <em>Strong enough on the inside that nothing on the outside can knock you down.</em></div>` },
+  { title: 'The Hardest Thing Jesus Said', text: `Then Jesus said the part that made everyone go quiet.
+
+<div class="bible-verse">"Love your enemies. Pray for the people who hurt you."</div>
+
+<em>"That's impossible,"</em> Benson said out loud.
+
+Jesus looked right at him.
+
+<div class="bible-verse">"I know. That's why you don't do it alone."</div>
+
+Sam nodded slowly.
+
+<div class="eli-bubble">💬 "My dad told me that when he gets really angry, he closes his eyes. He asks God to take the anger away and fill that space with love instead. He says it really works."</div>
+
+Benson thought about that.
+
+Maybe he wasn't supposed to fight the volcano alone. Maybe he was supposed to ask God to come inside and change what was there.
+
+<div class="prayer-bubble">🙏 "God. Take this feeling away from me.<br>Fill me with love instead."</div>` },
+  { title: 'You Are a Light', text: `Jesus stood up.
+
+He looked out at everyone on the hill.
+
+<div class="bible-verse">"You are the light of the world. Don't hide your light. Let it shine."</div>
+
+Benson sat very still.
+
+He thought about the times his light had gone out. When the volcano came. When he cried on the trampoline. When he slammed the door. When he screamed at Kylie over her Legos.
+
+He didn't want to hide his light anymore.
+
+He wanted to shine.
+
+But he knew he couldn't do it alone.
+
+<div class="closing-note">✨ <em>Nobody can. That's the whole point.</em></div>
+
+Right there on the hillside, he closed his eyes.
+
+<div class="prayer-bubble">🙏 "God, my heart feels too hot right now. I don't want to carry this volcano anymore.<br>Please cool it down whenever it starts to burn.<br>Fill that space with love instead.<br>Help me shine.<br>Amen."</div>
+
+Something changed. Not fixed. Not perfect.
+
+But different — like a door had opened just a crack, and light was coming through.` },
+  { title: 'The Next Morning', text: `The next morning at breakfast, Kate's leg touched Benson's under the table.
+
+The volcano began to rumble.
+
+He felt it coming — the eye roll, the head drop, something building in his chest.
+
+He closed his eyes.
+
+<div class="prayer-bubble">🙏 "God, my heart feels too hot right now. Will you cool it down with love?"</div>
+
+He opened his eyes again.
+
+Kate was eating her cereal. She wasn't even looking at him. She hadn't even noticed her leg touching his.
+
+Benson picked up his spoon and kept eating.
+
+He sat there very still for a moment. Waiting.
+
+Then something happened that he never expected.
+
+The feeling actually went away.
+
+Not all at once. More like when you stub your toe really hard and it hurts — and you're sure it will never stop hurting — but then, little by little, it just fades. Until it's completely gone.
+
+<div class="victory-bubble">🌟 The volcano went quiet.</div>
+
+Benson blinked. He could hardly believe it.
+
+<div class="eli-bubble">He had prayed a short, simple prayer. And somehow, God had really answered — right there over a bowl of cereal.</div>
+
+It wasn't magic. It was better than magic.
+
+It felt like God had reached right into his chest and quietly switched the volcano off.
+
+It didn't feel like a big deal.
+
+But it was one of the biggest things Benson had ever done.` },
+  { title: 'What Benson Knows Now', text: `Benson still has a volcano inside him.
+
+It will probably rumble again tomorrow. But now he knows something he didn't know before.
+
+He doesn't have to face it alone.
+
+<div class="eli-bubble">When Leo pushes his buttons — <em>"God, take this feeling away from me."</em><br>When Kate explodes at him — <em>"God, my heart feels too hot right now. Cool it with love."</em><br>When Kylie knocks over his Legos — <em>"God, fill me with love instead."</em></div>
+
+<div class="bible-verse">Blessed are the peacemakers — for they shall be called children of God.</div>
+
+<div class="victory-bubble">🌟 Children of God — that's exactly who Benson is.<br>Not a volcano. A light.</div>
+
+<div class="closing-note">💛 <em>Next time you feel the volcano starting, close your eyes, take one breath, and say it however feels true to you:<br><br>"God, take this feeling away from me. Fill me with love instead."<br>or<br>"God, my heart feels too hot right now — cool it down with love."<br><br>You don't have to say it perfectly. You just have to mean it.</em></div>` },
+];
+
+let bensonBibleVersion = 'A'; // 'A' = original, 'B' = reworded
 
 let bibleFontSize = 1.22; // rem
 function changeBibleFont(dir){
@@ -4506,15 +4744,21 @@ let biblePageIdx = 0;
 
 let bibleStory = null;
 
+function activeBensonBiblePages(){
+  return bensonBibleVersion === 'B' ? bensonBiblePagesB : bensonBiblePages;
+}
+
 function startBibleStory(which){
   bibleStory = which;
   biblePageIdx = 0;
-  const pages = which === 'kate_bible' ? kateBiblePages : bensonBiblePages;
+  const pages = which === 'kate_bible' ? kateBiblePages : activeBensonBiblePages();
   const title = which === 'kate_bible' ? '🌅 Kate Bible' : '🌄 Benson Bible';
   document.getElementById('bible-title').textContent = title;
   document.getElementById('bible-reader').classList.add('visible');
   document.getElementById('vocab-tab').style.display='none';
   document.getElementById('bible-word-cards-btn').style.display = (which === 'benson_bible') ? '' : 'none';
+  document.getElementById('bible-version-toggle').style.display = (which === 'benson_bible') ? '' : 'none';
+  updateBibleVersionToggleUI();
   updateTabCount();
   renderBiblePage();
 }
@@ -4527,8 +4771,23 @@ function exitBibleStory(){
   bibleStory = null;
 }
 
+function updateBibleVersionToggleUI(){
+  const btnA = document.getElementById('bible-version-a-btn');
+  const btnB = document.getElementById('bible-version-b-btn');
+  if (!btnA || !btnB) return;
+  btnA.classList.toggle('active', bensonBibleVersion === 'A');
+  btnB.classList.toggle('active', bensonBibleVersion === 'B');
+}
+function switchBibleVersion(v){
+  if (bensonBibleVersion === v) return;
+  bensonBibleVersion = v;
+  updateBibleVersionToggleUI();
+  biblePageIdx = 0;
+  renderBiblePage();
+}
+
 function renderBiblePage(){
-  const pages = bibleStory === 'kate_bible' ? kateBiblePages : bensonBiblePages;
+  const pages = bibleStory === 'kate_bible' ? kateBiblePages : activeBensonBiblePages();
   const total = pages.length;
   const page = pages[biblePageIdx];
 
@@ -4566,6 +4825,7 @@ function renderBiblePage(){
     // Re-apply font size to new page content
     changeBibleFont(0);
   }, 50);
+
 
   // Nav buttons
   const prev = document.getElementById('bible-prev');
