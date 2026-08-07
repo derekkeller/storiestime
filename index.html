@@ -2629,8 +2629,14 @@ let popupPausedReading = false; // tracks if popup caused the pause
 
 function showWordPopup(el, isTagged) {
   const word     = el.textContent.replace(/[.,!?'"]/g,'').trim();
-  const say      = isTagged ? (el.dataset.say || '') : '';
+  let   say      = isTagged ? (el.dataset.say || '') : '';
   const defn     = isTagged ? (el.dataset.def || '') : '';
+  // Fall back to the same phonetic dictionary Word Cards uses, so tapping
+  // any word during normal Benson Bible reading also teaches pronunciation.
+  if (!say && bibleStory === 'benson_bible') {
+    const key = word.toLowerCase();
+    if (BENSON_PHONETICS[key]) say = BENSON_PHONETICS[key];
+  }
   const sentence = getSentenceFor(el);
   const alreadySaved = !!vocabList.find(
     v => v.word.toLowerCase() === word.toLowerCase() && v.pageId === currentPageId
