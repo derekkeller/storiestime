@@ -2924,7 +2924,8 @@ const BENSON_PHONETICS = {
   amazing:"uh-MAY-zing", sometimes:"SUM-tymz", wanders:"WAHN-derz",
   someone:"SUM-wun", complains:"kum-PLAYNZ", solutions:"suh-LOO-shunz", hearing:"HEER-ing", finished:"FIH-nisht",
   complain:"kum-PLAYN",
-  throne:"THROHN", whine:"WYNE", spread:"SPRED", kettle:"KET-ul", rumble:"RUM-bul", steal:"STEEL", prove:"PROOV"
+  throne:"THROHN", whine:"WYNE", spread:"SPRED", kettle:"KET-ul", rumble:"RUM-bul", steal:"STEEL", prove:"PROOV",
+  erupts:"ih-RUPTS", spirit:"SPEER-it", heaven:"HEV-en"
 };
 function countSyllables(word) {
   const w = word.toLowerCase().replace(/[^a-z]/g, '');
@@ -2941,7 +2942,7 @@ const WC_PROPER_NOUNS = new Set(['benson','kate','kylie','leo','eli','jesus','go
 // Length/syllable count alone misses short words that are still genuinely
 // tricky to decode (consonant blends, silent-e, uncommon vocabulary) —
 // these are hand-picked, the same way every phonetic spelling is hand-written.
-const WC_ALWAYS_INCLUDE = new Set(['throne','whine','spread','kettle','rumble','steal','prove']);
+const WC_ALWAYS_INCLUDE = new Set(['throne','whine','spread','kettle','rumble','steal','prove','erupts','spirit','heaven']);
 function extractChallengingWords(pages, phoneticsDict) {
   const seen = new Set();
   const words = [];
