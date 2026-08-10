@@ -1361,9 +1361,13 @@ body {
 /* Bible nav */
 #bible-nav {
   display:flex; justify-content:space-between;
-  align-items:center; padding:8px 14px 12px;
-  border-top:1px solid rgba(0,0,0,.06);
-  flex-shrink:0; background:#FFFDF5;
+  align-items:center; padding:8px 14px 16px;
+  position:absolute; left:0; right:0; bottom:0;
+  background:linear-gradient(to top, #FFFDF5 60%, rgba(255,253,245,0));
+  pointer-events:none; /* the bar itself is see-through to touch/scroll... */
+}
+#bible-nav > * {
+  pointer-events:auto; /* ...but the actual buttons remain fully tappable */
 }
 .bible-nav-btn {
   background:#F5C518;
