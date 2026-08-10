@@ -19,7 +19,8 @@
   --bg:     #FFF8E1;
 }
 
-* { box-sizing:border-box; margin:0; padding:0; touch-action:manipulation; }
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { touch-action:manipulation; }
 
 body {
   font-family:'Nunito', sans-serif;
@@ -1284,7 +1285,17 @@ body {
 /* Page text */
 #bible-text-area {
   flex:1; overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
   padding:16px 20px 140px;
+}
+.page-end-marker {
+  text-align:center;
+  color:#aaa;
+  font-size:.78rem;
+  font-family:'Fredoka One',cursive;
+  letter-spacing:.5px;
+  margin-top:36px;
+  user-select:none;
 }
 #bible-page-title {
   font-family:'Fredoka One',cursive;
@@ -3963,7 +3974,8 @@ function wrapAllWords(containerId){
         if(p.classList&&(
           p.classList.contains('word')||
           p.classList.contains('any-word')||
-          p.classList.contains('short-word')
+          p.classList.contains('short-word')||
+          p.classList.contains('page-end-marker')
         )) return NodeFilter.FILTER_REJECT;
         p=p.parentElement;
       }
@@ -4826,7 +4838,8 @@ function renderBiblePage(){
 
   // Title and text
   document.getElementById('bible-page-title').textContent = page.title;
-  document.getElementById('bible-page-body').innerHTML = page.text;
+  document.getElementById('bible-page-body').innerHTML = page.text +
+    '<div class="page-end-marker">· · · Page ' + (biblePageIdx + 1) + ' of ' + total + ' · End of page · · ·</div>';
   // Set currentPageId so word popup save works
   currentPageId = bibleStory + '_p' + biblePageIdx;
 
