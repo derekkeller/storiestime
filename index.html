@@ -589,6 +589,40 @@ body {
   cursor:pointer;
 }
 .wc-replay-btn:active { transform:translateY(1px); }
+.wc-summary-title {
+  font-family:'Fredoka One',cursive;
+  color:#7B1FA2;
+  font-size:1.3rem;
+  text-align:center;
+  margin-bottom:6px;
+}
+.wc-summary-sub {
+  text-align:center;
+  color:#888;
+  font-size:.85rem;
+  margin-bottom:20px;
+}
+.wc-summary-list {
+  max-width:480px; margin:0 auto;
+  display:flex; flex-direction:column; gap:10px;
+}
+.wc-summary-item {
+  display:flex; justify-content:space-between; align-items:center;
+  background:#F5E9FB;
+  border:2px solid #7B1FA2;
+  border-radius:12px;
+  padding:12px 16px;
+}
+.wc-summary-word {
+  font-family:'Fredoka One',cursive;
+  font-size:1.1rem;
+  color:#2C1810;
+}
+.wc-summary-say {
+  font-size:.9rem;
+  color:#1565C0;
+  font-weight:800;
+}
 #word-cards-footer {
   display:flex; align-items:center; justify-content:space-between;
   gap:10px;
@@ -3012,8 +3046,12 @@ function openWordCardsModal() {
 function closeWordCardsModal() {
   document.getElementById('word-cards-modal').classList.remove('open');
 }
-function wordCardsTotalPages() {
+function wordCardsChipPageCount() {
   return Math.max(1, Math.ceil(wordCardsList.length / WORD_CARDS_PER_PAGE));
+}
+function wordCardsTotalPages() {
+  // +1 for the final summary page listing every word that was checked for practice
+  return wordCardsChipPageCount() + 1;
 }
 function renderWordCardsPage() {
   const listEl  = document.getElementById('word-cards-list');
@@ -3030,7 +3068,15 @@ function renderWordCardsPage() {
     return;
   }
 
+  const chipPages = wordCardsChipPageCount();
   const total = wordCardsTotalPages();
+
+  // Last "page" is the summary — render it instead of a chip grid.
+  if (wordCardsPageIdx >= chipPages) {
+    renderWordCardsSummary(total);
+    return;
+  }
+
   const start = wordCardsPageIdx * WORD_CARDS_PER_PAGE;
   const chunk = wordCardsList.slice(start, start + WORD_CARDS_PER_PAGE);
 
@@ -3064,7 +3110,47 @@ function renderWordCardsPage() {
   ).join('');
 
   prevBtn.disabled = wordCardsPageIdx === 0;
-  nextBtn.disabled = wordCardsPageIdx === total - 1;
+  nextBtn.disabled = false; // always allow advancing into the summary page
+}
+function renderWordCardsSummary(total) {
+  const listEl  = document.getElementById('word-cards-list');
+  const labelEl = document.getElementById('word-cards-page-label');
+  const dotsEl  = document.getElementById('word-cards-dots');
+  const prevBtn = document.getElementById('wc-prev-btn');
+  const nextBtn = document.getElementById('wc-next-btn');
+
+  labelEl.textContent = 'Summary';
+
+  // Collect the checked (flagged-for-practice) words, in the order first checked,
+  // deduped, with their phonetic spelling for the screenshot.
+  const seen = new Set();
+  const checkedWords = [];
+  wordCardsList.forEach(w => {
+    if (wordChallengeActive.has(w.word) && !seen.has(w.word)) {
+      seen.add(w.word);
+      checkedWords.push(w);
+    }
+  });
+
+  if (!checkedWords.length) {
+    listEl.innerHTML = '<div class="vocab-empty">🎉 No words were checked for extra practice this time!</div>';
+  } else {
+    listEl.innerHTML =
+      '<div class="wc-summary-title">📋 Words Checked for Practice</div>' +
+      '<div class="wc-summary-sub">' + checkedWords.length + ' word' + (checkedWords.length === 1 ? '' : 's') + ' — snap a photo to keep track!</div>' +
+      '<div class="wc-summary-list">' +
+      checkedWords.map(w =>
+        '<div class="wc-summary-item"><span class="wc-summary-word">' + w.word + '</span><span class="wc-summary-say">🔊 ' + w.say + '</span></div>'
+      ).join('') +
+      '</div>';
+  }
+
+  dotsEl.innerHTML = Array.from({ length: total }, (_, i) =>
+    '<div class="wc-dot' + (i === wordCardsPageIdx ? ' active' : '') + '"></div>'
+  ).join('');
+
+  prevBtn.disabled = false;
+  nextBtn.disabled = true; // this is the last page
 }
 function wordCardsPrevPage() {
   if (wordCardsPageIdx > 0) { wordCardsPageIdx--; renderWordCardsPage(); }
