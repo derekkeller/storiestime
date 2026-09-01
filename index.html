@@ -5159,7 +5159,7 @@ function renderBiblePage(){
 }
 
 function bibleNextPage(){
-  const pages = bibleStory === 'kate_bible' ? kateBiblePages : bensonBiblePages;
+  const pages = bibleStory === 'kate_bible' ? kateBiblePages : activeBensonBiblePages();
   if(biblePageIdx < pages.length - 1){
     biblePageIdx++;
     renderBiblePage();
