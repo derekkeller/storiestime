@@ -623,6 +623,146 @@ body {
   color:#1565C0;
   font-weight:800;
 }
+#wc-spell-btn, #spell-done-btn {
+  display:block;
+  width:100%;
+  max-width:480px;
+  margin:24px auto 0;
+  background:#F5C518; color:#2C1810;
+  border:none; border-bottom:4px solid #c9960a;
+  border-radius:14px;
+  padding:14px; font-family:'Fredoka One',cursive;
+  font-size:1.1rem; cursor:pointer;
+}
+
+/* ══ SPELLING PRACTICE MODAL ══ */
+#spell-modal {
+  position:fixed; inset:0;
+  z-index:9350;
+  display:none;
+  flex-direction:column;
+  background:#FFFDF5;
+}
+#spell-modal.open { display:flex; }
+#spell-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 18px 12px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  flex-shrink:0;
+}
+#spell-header h2 {
+  font-family:'Fredoka One',cursive;
+  color:#B37A00; font-size:1.25rem;
+}
+#spell-close-x {
+  background:#eee; border:none; border-radius:50%;
+  width:34px; height:34px; flex-shrink:0;
+  font-size:1.1rem; color:#555; cursor:pointer;
+  margin-left:12px;
+}
+#spell-body {
+  flex:1; overflow-y:auto;
+  padding:20px 18px;
+  display:flex; flex-direction:column; align-items:center;
+}
+#spell-speak-btn {
+  display:block;
+  background:#F5C518; color:#2C1810;
+  border:none; border-bottom:4px solid #c9960a;
+  border-radius:14px;
+  padding:14px 28px;
+  font-family:'Fredoka One',cursive; font-size:1.05rem; cursor:pointer;
+  margin-bottom:18px;
+}
+#spell-speak-btn:active { transform:translateY(2px); }
+#spell-hints-cluster {
+  width:100%; max-width:480px;
+  background:#F8F3FC;
+  border:2px dashed #D8BFE8;
+  border-radius:14px;
+  padding:10px 12px;
+  margin-bottom:16px;
+}
+#spell-hint-row {
+  display:flex; gap:6px; flex-wrap:wrap; justify-content:center;
+}
+#spell-hint-btn, #spell-decoy-btn, #spell-letter-hint-btn, #spell-peek-btn {
+  background:#fff; border:2px solid #7B1FA2; color:#7B1FA2;
+  border-radius:16px; padding:5px 12px;
+  font-family:'Fredoka One',cursive; font-size:.72rem; cursor:pointer;
+}
+#spell-hint-btn.active, #spell-decoy-btn.active {
+  background:#7B1FA2; color:#fff;
+}
+#spell-letter-hint-btn:disabled {
+  opacity:.4; cursor:default;
+}
+#spell-peek-btn {
+  border-color:#F5C518; color:#B37A00;
+}
+#spell-peek-btn.active {
+  background:#F5C518; color:#2C1810;
+}
+#spell-hint-text, #spell-peek-text {
+  font-size:.9rem; font-weight:800; color:#1565C0;
+  text-align:center;
+}
+#spell-hint-text:empty, #spell-peek-text:empty {
+  display:none;
+}
+#spell-hint-text {
+  margin-top:8px;
+}
+#spell-peek-text {
+  color:#7B1FA2; letter-spacing:1px; margin-top:4px;
+}
+#spell-slots {
+  display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+  margin-bottom:24px;
+}
+.spell-slot {
+  width:40px; height:48px;
+  border-bottom:4px solid #F5C518;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Fredoka One',cursive; font-size:1.4rem;
+  color:#2C1810; background:#FFF8E1; border-radius:8px 8px 0 0;
+}
+.spell-slot.filled { background:#FFF3C4; }
+.spell-slot.slot-correct { background:#C8E6C9; border-bottom-color:#2E7D32; color:#1B5E20; }
+.spell-slot.slot-incorrect { background:#FFCDD2; border-bottom-color:#C62828; color:#B71C1C; }
+#spell-tiles {
+  display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+  max-width:480px; margin-bottom:16px;
+}
+.spell-tile {
+  width:44px; height:44px;
+  background:#F5C518; border:none; border-bottom:4px solid #c9960a;
+  border-radius:10px;
+  font-family:'Fredoka One',cursive; font-size:1.3rem;
+  color:#2C1810; cursor:pointer;
+}
+.spell-tile.used { visibility:hidden; }
+#spell-undo-btn {
+  background:#eee; border:none; border-radius:10px;
+  padding:8px 18px; font-family:'Fredoka One',cursive;
+  font-size:.9rem; color:#555; cursor:pointer;
+  margin-bottom:12px;
+}
+#spell-feedback {
+  min-height:1.6rem;
+  font-family:'Fredoka One',cursive; font-size:1.1rem;
+  text-align:center;
+}
+#spell-feedback.correct { color:#2E7D32; }
+#spell-feedback.incorrect { color:#e53935; }
+#spell-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; padding:12px 18px 20px;
+  border-top:1px solid rgba(0,0,0,.06);
+  flex-shrink:0;
+}
+#spell-dots { display:flex; gap:8px; justify-content:center; flex:1; }
+
 #word-cards-footer {
   display:flex; align-items:center; justify-content:space-between;
   gap:10px;
@@ -1621,6 +1761,39 @@ body {
     <button class="wc-nav-btn" id="wc-prev-btn" onclick="wordCardsPrevPage()">◀ Back</button>
     <div id="word-cards-dots"></div>
     <button class="wc-nav-btn" id="wc-next-btn" onclick="wordCardsNextPage()">Next ▶</button>
+  </div>
+</div>
+
+<!-- ══ SPELLING PRACTICE (letter-tile exercise) ══ -->
+<div id="spell-modal">
+  <div id="spell-header">
+    <div>
+      <h2>✏️ Spell It!</h2>
+      <div class="panel-sub" id="spell-progress-label"></div>
+    </div>
+    <button id="spell-close-x" onclick="closeSpellModal()">✕</button>
+  </div>
+  <div id="spell-body">
+    <button id="spell-speak-btn" onclick="speakSpellWord()">🔊 Hear the Word</button>
+    <div id="spell-hints-cluster">
+      <div id="spell-hint-row">
+        <button id="spell-hint-btn" onclick="toggleSpellHint()">👀 Hint</button>
+        <button id="spell-letter-hint-btn" onclick="revealNextSpellLetter()">🔤 Letter</button>
+        <button id="spell-decoy-btn" onclick="toggleSpellDecoys()">➖ Extras</button>
+        <button id="spell-peek-btn" onclick="toggleSpellPeek()">🔑 Peek</button>
+      </div>
+      <div id="spell-hint-text"></div>
+      <div id="spell-peek-text"></div>
+    </div>
+    <div id="spell-slots"></div>
+    <div id="spell-tiles"></div>
+    <button id="spell-undo-btn" onclick="undoSpellTile()">⌫ Undo</button>
+    <div id="spell-feedback"></div>
+  </div>
+  <div id="spell-footer">
+    <button class="wc-nav-btn" id="spell-prev-btn" onclick="spellPrevWord()">◀ Back</button>
+    <div id="spell-dots"></div>
+    <button class="wc-nav-btn" id="spell-next-btn" onclick="spellNextWord()">Skip ▶</button>
   </div>
 </div>
 
@@ -3153,6 +3326,7 @@ function renderWordCardsSummary(total) {
       ).join('') +
       '</div>';
   }
+  listEl.innerHTML += '<button id="wc-spell-btn" onclick="openSpellModal()">✏️ Practice Spelling</button>';
 
   dotsEl.innerHTML = Array.from({ length: total }, (_, i) =>
     '<div class="wc-dot' + (i === wordCardsPageIdx ? ' active' : '') + '"></div>'
@@ -3193,6 +3367,229 @@ function engageChallengeWord(word, say, fromAbsIdx) {
   }
 
   renderWordCardsPage();
+}
+
+// ── SPELLING PRACTICE (letter-tile exercise) ──
+let spellWords = [];
+let spellIndex = 0;
+let spellDecoysEnabled = true; // on by default, per design
+let spellHintShown = false;
+let spellPeekShown = false;
+let spellSlots = [];   // array of filled letters (or null) per slot
+let spellTiles = [];   // array of { id, letter, used }
+
+function openSpellModal() {
+  // Use every word from this session's Word Cards, deduped (a word flagged
+  // for repeat practice shouldn't be spelled multiple times), freshly shuffled.
+  const seen = new Set();
+  const unique = [];
+  wordCardsList.forEach(w => {
+    if (!seen.has(w.word)) { seen.add(w.word); unique.push(w); }
+  });
+  spellWords = shuffleArray(unique);
+  spellIndex = 0;
+  document.getElementById('spell-speak-btn').style.display = ('speechSynthesis' in window) ? '' : 'none';
+  document.getElementById('spell-modal').classList.add('open');
+  renderSpellWord();
+}
+function closeSpellModal() {
+  document.getElementById('spell-modal').classList.remove('open');
+}
+
+function generateSpellTiles(word) {
+  const letters = word.toUpperCase().split('');
+  let tileLetters = letters.slice();
+  if (spellDecoysEnabled) {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(c => !letters.includes(c));
+    const decoyCount = Math.min(3, alphabet.length);
+    const shuffledAlpha = shuffleArray(alphabet);
+    tileLetters = tileLetters.concat(shuffledAlpha.slice(0, decoyCount));
+  }
+  const shuffled = shuffleArray(tileLetters);
+  return shuffled.map((letter, i) => ({ id: 'st-' + i, letter, used: false }));
+}
+
+function speakSpellWord() {
+  if (!('speechSynthesis' in window)) return; // gracefully do nothing on unsupported browsers
+  const entry = spellWords[spellIndex];
+  if (!entry) return;
+  window.speechSynthesis.cancel(); // stop any overlapping utterance first
+  const utterance = new SpeechSynthesisUtterance(entry.word);
+  utterance.rate = 0.85; // a touch slower, easier for a young reader to follow
+  window.speechSynthesis.speak(utterance);
+}
+
+function renderSpellWord() {
+  const total = spellWords.length;
+  if (!total) {
+    document.getElementById('spell-body').innerHTML = '<div class="vocab-empty">No words to practice yet!</div>';
+    document.getElementById('spell-progress-label').textContent = '';
+    document.getElementById('spell-dots').innerHTML = '';
+    document.getElementById('spell-prev-btn').disabled = true;
+    document.getElementById('spell-next-btn').disabled = true;
+    return;
+  }
+  if (spellIndex >= total) {
+    renderSpellCompletion();
+    return;
+  }
+
+  const entry = spellWords[spellIndex];
+  spellHintShown = false;
+  spellSlots = new Array(entry.word.length).fill(null);
+  spellTiles = generateSpellTiles(entry.word);
+
+  document.getElementById('spell-progress-label').textContent = 'Word ' + (spellIndex + 1) + ' of ' + total;
+  document.getElementById('spell-hint-btn').textContent = '👀 Hint';
+  document.getElementById('spell-hint-btn').classList.remove('active');
+  document.getElementById('spell-hint-text').textContent = '';
+  document.getElementById('spell-decoy-btn').textContent = spellDecoysEnabled ? '➖ Extras' : '➕ Extras';
+  document.getElementById('spell-decoy-btn').classList.toggle('active', spellDecoysEnabled);
+  document.getElementById('spell-feedback').textContent = '';
+  document.getElementById('spell-feedback').className = '';
+  spellPeekShown = false;
+  document.getElementById('spell-peek-btn').textContent = '🔑 Peek';
+  document.getElementById('spell-peek-btn').classList.remove('active');
+  document.getElementById('spell-peek-text').textContent = '';
+
+  renderSpellSlotsAndTiles();
+
+  try { speakSpellWord(); } catch (e) { /* best-effort — manual button still works */ }
+
+  document.getElementById('spell-dots').innerHTML = Array.from({ length: total }, (_, i) =>
+    '<div class="wc-dot' + (i === spellIndex ? ' active' : '') + '"></div>'
+  ).join('');
+  document.getElementById('spell-prev-btn').disabled = spellIndex === 0;
+  document.getElementById('spell-next-btn').disabled = false;
+}
+
+function renderSpellSlotsAndTiles() {
+  const slotsEl = document.getElementById('spell-slots');
+  slotsEl.innerHTML = spellSlots.map((letter, i) =>
+    '<div class="spell-slot' + (letter ? ' filled' : '') + '" id="spell-slot-' + i + '">' + (letter || '') + '</div>'
+  ).join('');
+
+  const tilesEl = document.getElementById('spell-tiles');
+  tilesEl.innerHTML = spellTiles.map(t =>
+    '<button class="spell-tile' + (t.used ? ' used' : '') + '" onclick="tapSpellTile(\'' + t.id + '\')" ' + (t.used ? 'disabled' : '') + '>' + t.letter + '</button>'
+  ).join('');
+
+  document.getElementById('spell-letter-hint-btn').disabled = spellSlots.indexOf(null) === -1;
+}
+
+function tapSpellTile(tileId) {
+  const tile = spellTiles.find(t => t.id === tileId);
+  if (!tile || tile.used) return;
+  const nextEmpty = spellSlots.indexOf(null);
+  if (nextEmpty === -1) return; // slots already full
+  spellSlots[nextEmpty] = tile.letter;
+  tile.used = true;
+  renderSpellSlotsAndTiles();
+  if (spellSlots.indexOf(null) === -1) checkSpellAnswer();
+}
+
+function undoSpellTile() {
+  for (let i = spellSlots.length - 1; i >= 0; i--) {
+    if (spellSlots[i] !== null) {
+      const letter = spellSlots[i];
+      spellSlots[i] = null;
+      const tile = spellTiles.find(t => t.letter === letter && t.used);
+      if (tile) tile.used = false;
+      renderSpellSlotsAndTiles();
+      document.getElementById('spell-feedback').textContent = '';
+      document.getElementById('spell-feedback').className = '';
+      return;
+    }
+  }
+}
+
+function checkSpellAnswer() {
+  const attempt = spellSlots.join('').toLowerCase();
+  const feedbackEl = document.getElementById('spell-feedback');
+  const entry = spellWords[spellIndex];
+  if (attempt === entry.word.toLowerCase()) {
+    feedbackEl.textContent = '✅ Correct!';
+    feedbackEl.className = 'correct';
+    setTimeout(() => { spellIndex++; renderSpellWord(); }, 1200);
+  } else {
+    feedbackEl.textContent = '❌ Try again!';
+    feedbackEl.className = 'incorrect';
+    const targetLetters = entry.word.toUpperCase().split('');
+    spellSlots.forEach((letter, i) => {
+      const slotEl = document.getElementById('spell-slot-' + i);
+      if (!slotEl) return;
+      slotEl.classList.add(letter === targetLetters[i] ? 'slot-correct' : 'slot-incorrect');
+    });
+    setTimeout(() => {
+      if (spellSlots.indexOf(null) !== -1) return; // already intervened via Undo — don't clobber it
+      spellSlots = new Array(entry.word.length).fill(null);
+      spellTiles.forEach(t => t.used = false);
+      renderSpellSlotsAndTiles();
+      feedbackEl.textContent = '';
+      feedbackEl.className = '';
+    }, 1800);
+  }
+}
+
+function revealNextSpellLetter() {
+  const entry = spellWords[spellIndex];
+  const nextEmpty = spellSlots.indexOf(null);
+  if (nextEmpty === -1) return; // no empty slots left — nothing to reveal
+  const correctLetter = entry.word.toUpperCase()[nextEmpty];
+  const tile = spellTiles.find(t => t.letter === correctLetter && !t.used);
+  spellSlots[nextEmpty] = correctLetter;
+  if (tile) tile.used = true;
+  renderSpellSlotsAndTiles();
+  if (spellSlots.indexOf(null) === -1) checkSpellAnswer();
+}
+
+function toggleSpellPeek() {
+  spellPeekShown = !spellPeekShown;
+  const btn = document.getElementById('spell-peek-btn');
+  const textEl = document.getElementById('spell-peek-text');
+  btn.textContent = spellPeekShown ? '🙈 Hide' : '🔑 Peek';
+  btn.classList.toggle('active', spellPeekShown);
+  textEl.textContent = spellPeekShown ? spellWords[spellIndex].word.toUpperCase() : '';
+}
+
+function toggleSpellHint() {
+  spellHintShown = !spellHintShown;
+  const btn = document.getElementById('spell-hint-btn');
+  const textEl = document.getElementById('spell-hint-text');
+  btn.classList.toggle('active', spellHintShown);
+  btn.textContent = spellHintShown ? '🙈 Hide' : '👀 Hint';
+  textEl.textContent = spellHintShown ? '🔊 ' + spellWords[spellIndex].say : '';
+}
+
+function toggleSpellDecoys() {
+  spellDecoysEnabled = !spellDecoysEnabled;
+  const entry = spellWords[spellIndex];
+  spellSlots = new Array(entry.word.length).fill(null);
+  spellTiles = generateSpellTiles(entry.word);
+  document.getElementById('spell-decoy-btn').textContent = spellDecoysEnabled ? '➖ Extras' : '➕ Extras';
+  document.getElementById('spell-decoy-btn').classList.toggle('active', spellDecoysEnabled);
+  document.getElementById('spell-feedback').textContent = '';
+  document.getElementById('spell-feedback').className = '';
+  renderSpellSlotsAndTiles();
+}
+
+function spellPrevWord() {
+  if (spellIndex > 0) { spellIndex--; renderSpellWord(); }
+}
+function spellNextWord() {
+  spellIndex++;
+  renderSpellWord();
+}
+
+function renderSpellCompletion() {
+  document.getElementById('spell-body').innerHTML =
+    '<div class="wc-summary-title">🎉 Great Spelling Practice!</div>' +
+    '<div class="wc-summary-sub">You worked through ' + spellWords.length + ' word' + (spellWords.length === 1 ? '' : 's') + '.</div>' +
+    '<button id="spell-done-btn" onclick="closeSpellModal()">✅ Done</button>';
+  document.getElementById('spell-progress-label').textContent = '';
+  document.getElementById('spell-dots').innerHTML = '';
+  document.getElementById('spell-prev-btn').disabled = false;
+  document.getElementById('spell-next-btn').disabled = true;
 }
 
 
