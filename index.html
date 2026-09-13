@@ -488,6 +488,9 @@ body {
   border-bottom:1px solid rgba(0,0,0,.06);
   flex-shrink:0;
 }
+#word-cards-header > div:first-child {
+  flex:1; min-width:0;
+}
 #word-cards-header h2 {
   font-family:'Fredoka One',cursive;
   color:#B37A00;
@@ -501,6 +504,14 @@ body {
   width:34px; height:34px; flex-shrink:0;
   font-size:1.1rem; color:#555; cursor:pointer;
   margin-left:12px;
+}
+#word-cards-spell-header-btn {
+  background:#7B1FA2; color:#fff;
+  border:none; border-radius:16px;
+  padding:8px 14px; flex-shrink:0;
+  font-family:'Fredoka One',cursive;
+  font-size:.78rem; cursor:pointer;
+  margin-left:8px;
 }
 #word-cards-body {
   flex:1;
@@ -623,16 +634,19 @@ body {
   color:#1565C0;
   font-weight:800;
 }
-#wc-spell-btn, #spell-done-btn {
+#wc-spell-btn, #spell-done-btn, #spell-back-groups-btn, #spell-next-group-btn {
   display:block;
   width:100%;
   max-width:480px;
-  margin:24px auto 0;
+  margin:14px auto 0;
   background:#F5C518; color:#2C1810;
   border:none; border-bottom:4px solid #c9960a;
   border-radius:14px;
   padding:14px; font-family:'Fredoka One',cursive;
   font-size:1.1rem; cursor:pointer;
+}
+#wc-spell-btn, #spell-done-btn {
+  margin-top:24px;
 }
 
 /* ══ SPELLING PRACTICE MODAL ══ */
@@ -659,6 +673,27 @@ body {
   width:34px; height:34px; flex-shrink:0;
   font-size:1.1rem; color:#555; cursor:pointer;
   margin-left:12px;
+}
+#spell-groups-btn {
+  background:#eee; border:none; border-radius:14px;
+  padding:8px 12px; flex-shrink:0;
+  font-family:'Fredoka One',cursive;
+  font-size:.78rem; color:#555; cursor:pointer;
+  margin-left:8px;
+}
+.spell-group-list {
+  width:100%; max-width:480px; margin:0 auto;
+  display:flex; flex-direction:column; gap:10px;
+}
+.spell-group-btn {
+  display:flex; justify-content:space-between; align-items:center;
+  background:#FFF8E1; border:2px solid #F5C518;
+  border-radius:14px; padding:14px 18px;
+  font-family:'Fredoka One',cursive; font-size:1rem;
+  color:#2C1810; cursor:pointer; text-align:left;
+}
+.spell-group-btn .sg-count {
+  font-size:.8rem; color:#888; font-weight:normal;
 }
 #spell-body {
   flex:1; overflow-y:auto;
@@ -1751,6 +1786,7 @@ body {
       <h2>📇 Tricky Word Cards</h2>
       <div class="panel-sub">Tap a word to see how to sound it out!</div>
     </div>
+    <button id="word-cards-spell-header-btn" onclick="openSpellModal()">✏️ Spell</button>
     <button id="word-cards-close-x" onclick="closeWordCardsModal()">✕</button>
   </div>
   <div id="word-cards-body">
@@ -1771,6 +1807,7 @@ body {
       <h2>✏️ Spell It!</h2>
       <div class="panel-sub" id="spell-progress-label"></div>
     </div>
+    <button id="spell-groups-btn" onclick="backToSpellGroups()" style="display:none;">◀ Groups</button>
     <button id="spell-close-x" onclick="closeSpellModal()">✕</button>
   </div>
   <div id="spell-body">
@@ -3111,16 +3148,15 @@ const BENSON_PHONETICS = {
   everything:"EV-ree-thing", blessed:"BLES-id", kingdom:"KING-dum", closest:"KLOH-sist",
   feeling:"FEE-ling", screamed:"SKREEMD", trampoline:"tram-puh-LEEN", knocked:"NOKT",
   completely:"kum-PLEET-lee", something:"SUM-thing", straight:"STRAYT", forgotten:"for-GAH-tin",
-  volcano:"vol-KAY-noh", inside:"in-SYDE", incredible:"in-KRED-uh-bul", creations:"kree-AY-shunz",
-  happens:"HAP-inz", breakfast:"BREK-fist", touches:"TUH-chiz", explode:"ik-SPLOHD",
+  volcano:"vol-KAY-noh", inside:"in-SYDE", incredible:"in-KRED-uh-bul", creations:"kree-AY-shunz", breakfast:"BREK-fist", touches:"TUH-chiz", explode:"ik-SPLOHD",
   toddles:"TAH-dulz", delicate:"DEL-ih-kit", creation:"kree-AY-shun", minutes:"MIH-nits",
-  building:"BIL-ding", afterward:"AF-ter-werd", jumping:"JUM-ping", friends:"FRENDZ",
+  building:"BIL-ding", afterward:"AF-ter-werd", friends:"FRENDZ",
   waiting:"WAY-ting", smaller:"SMAW-ler", younger:"YUNG-ger", instantly:"IN-stint-lee",
   erupted:"ih-RUP-did", crossed:"KRAWST", refused:"rih-FYOOZD", playing:"PLAY-ing",
   laughing:"LAF-ing", because:"bih-KUZ", working:"WER-king", exactly:"ig-ZAKT-lee",
   watched:"WAHCHT", quietly:"KWY-it-lee", thought:"THAWT", buttons:"BUH-tinz",
   nothing:"NUH-thing", outside:"out-SYDE", enemies:"EN-uh-meez", impossible:"im-PAH-suh-bul",
-  alone:"uh-LOHN", instead:"in-STED", actually:"AK-shoo-uh-lee", fighting:"FY-ting",
+  alone:"uh-LOHN", instead:"in-STED", actually:"AK-shoo-uh-lee",
   himself:"him-SELF", slammed:"SLAMD", hillside:"HIL-syde", anymore:"en-ee-MOR",
   different:"DIF-er-ent", perfect:"PER-fikt", opened:"OH-pind", through:"THROO",
   morning:"MOR-ning", touched:"TUHCHT", looking:"LUK-ing", happened:"HAP-ind",
@@ -3129,34 +3165,56 @@ const BENSON_PHONETICS = {
   biggest:"BIG-ist", probably:"PRAH-buh-blee", tomorrow:"tuh-MOR-oh", before:"bih-FOR",
   explodes:"ik-SPLOHDZ", peacemakers:"PEES-may-kerz", children:"CHIL-drin", starting:"STAHR-ting",
   // Added for Version B (reworded story)
-  ordinary:"OR-din-air-ee", afternoon:"af-ter-NOON", climbed:"KLYMD", finally:"FY-nuh-lee",
+  afternoon:"af-ter-NOON", climbed:"KLYMD", finally:"FY-nuh-lee",
   special:"SPESH-ul", grinning:"GRIH-ning", mattered:"MAT-erd", explained:"ik-SPLAYND",
-  measure:"MEZH-er", toppled:"TAH-puld", control:"kun-TROHL", yelling:"YEL-ing",
-  speaking:"SPEE-king", brushes:"BRUH-shiz", suddenly:"SUH-din-lee", ignites:"ig-NYTS",
-  whistle:"WISS-ul", barely:"BAIR-lee", meaning:"MEE-ning", wandering:"WAHN-der-ing",
-  careful:"KAIR-ful", flattening:"FLAT-en-ing", realized:"REE-uh-lyzd", bouncing:"BOWN-sing",
-  patiently:"PAY-shint-lee", plopped:"PLAHPT", meanwhile:"MEEN-wyle", realizing:"REE-uh-ly-zing",
+  measure:"MEZH-er", control:"kun-TROHL", yelling:"YEL-ing",
+  speaking:"SPEE-king", ignites:"ig-NYTS", barely:"BAIR-lee", wandering:"WAHN-der-ing", realized:"REE-uh-lyzd", bouncing:"BOWN-sing", plopped:"PLAHPT",
   grinned:"GRIND", watching:"WAH-ching", beside:"bih-SYDE", anyone:"EN-ee-wun",
-  thinking:"THING-king", deserved:"dih-ZERVD", already:"awl-RED-ee", blurted:"BLER-tid",
+  thinking:"THING-king", already:"awl-RED-ee", blurted:"BLER-tid",
   whenever:"wen-EV-er", supposed:"suh-POHZD", slamming:"SLAM-ing", screaming:"SKREE-ming",
-  scattered:"SKAT-erd", manage:"MAN-ij", shifted:"SHIF-tid", cracked:"KRAKT",
-  brushed:"BRUHSHT", against:"uh-GENST", dropped:"DRAHPT", pressure:"PRESH-er",
-  glancing:"GLAN-sing", noticed:"NOH-tist", touching:"TUH-ching", stubbing:"STUH-bing",
-  certain:"SER-tin", forever:"for-EV-er", believing:"bih-LEE-ving", somehow:"SUM-how",
+  scattered:"SKAT-erd", manage:"MAN-ij", shifted:"SHIF-tid", cracked:"KRAKT", against:"uh-GENST", dropped:"DRAHPT", noticed:"NOH-tist", touching:"TUH-ching", stubbing:"STUH-bing",
+  certain:"SER-tin", forever:"for-EV-er", somehow:"SUM-how",
   switched:"SWICHT", carries:"KAIR-eez", however:"how-EV-er", perfectly:"PER-fikt-lee",
   amazing:"uh-MAY-zing", sometimes:"SUM-tymz", wanders:"WAHN-derz",
-  someone:"SUM-wun", complains:"kum-PLAYNZ", solutions:"suh-LOO-shunz", hearing:"HEER-ing", finished:"FIH-nisht",
+  someone:"SUM-wun",
   complain:"kum-PLAYN",
   throne:"THROHN", whine:"WYNE", spread:"SPRED", kettle:"KET-ul", rumble:"RUM-bul", steal:"STEEL", prove:"PROOV",
   erupts:"ih-RUPTS", spirit:"SPEER-it", heaven:"HEV-en",
   familiar:"fuh-MIL-yer", refusing:"rih-FYOO-zing", another:"uh-NUH-ther", minute:"MIN-it",
   staying:"STAY-ing", eleven:"ih-LEV-en", winning:"WIN-ing", chasing:"CHAY-sing",
-  cheering:"CHEER-ing", stopped:"STAHPT", pushing:"PUSH-ing", breaking:"BRAY-king",
+  cheering:"CHEER-ing", stopped:"STAHPT",
   enjoying:"en-JOY-ing", figured:"FIG-yerd", whether:"WETH-er", teaching:"TEE-ching",
-  gathered:"GATH-erd", opening:"OH-pen-ing", topples:"TAH-pulz",
-  walking:"WAW-king", together:"tuh-GETH-er", hanging:"HANG-ing", remembered:"rih-MEM-berd",
-  imagining:"ih-MAJ-in-ing", clearly:"KLEER-lee", sleepovers:"SLEEP-oh-verz",
-  imagined:"ih-MAJ-ind"
+  gathered:"GATH-erd", topples:"TAH-pulz",
+  walking:"WAW-king", together:"tuh-GETH-er", hanging:"HANG-ing", remembered:"rih-MEM-berd", clearly:"KLEER-lee", sleepovers:"SLEEP-oh-verz",
+  imagined:"ih-MAJ-ind",
+  travels:"TRAV-ulz", particular:"per-TIK-yoo-ler", traveled:"TRAV-uld", arrived:"uh-RYVD",
+  curious:"KYOOR-ee-us", despite:"dih-SPYT", cleared:"KLEERD", entire:"en-TYR",
+  belongs:"bih-LONGZ", especially:"es-PESH-uh-lee", recognize:"REK-ug-nyz", freckled:"FREK-uld",
+  sunburnt:"SUN-bernt", nearest:"NEER-ist", recognized:"REK-ug-nyzd", immediately:"ih-MEE-dee-it-lee",
+  getting:"GET-ing", sulking:"SUL-king", flatten:"FLAT-en", directly:"dih-REKT-lee",
+  blessing:"BLES-ing", somewhere:"SUM-wair", beneath:"bih-NEETH", dormant:"DOR-munt",
+  cheerful:"CHEER-ful", ridiculous:"rih-DIK-yoo-lus", constructing:"kun-STRUK-ting", magnificent:"mag-NIF-ih-sent",
+  admire:"ad-MYR", warning:"WOR-ning", rumbling:"RUM-bling", corrects:"kuh-REKTS",
+  whatever:"wut-EV-er", shoulders:"SHOHL-derz", entirely:"en-TYR-lee", innocent:"IN-uh-sent",
+  flattens:"FLAT-enz", eruption:"ih-RUP-shun", scrappy:"SKRAP-ee", fearless:"FEER-lis",
+  bothered:"BAH-therd", energy:"EN-er-jee", laughed:"LAFT", crouched:"KROWCHT",
+  strange:"STRAYNJ", continued:"kun-TIN-yood", furious:"FYOOR-ee-us", accuse:"uh-KYOOZ",
+  cheating:"CHEE-ting", refuse:"rih-FYOOZ", unfortunately:"un-FOR-chuh-nit-lee", returned:"rih-TERND",
+  remained:"rih-MAYND", happiness:"HAP-ee-nes", explain:"ik-SPLAYN", puzzled:"PUZ-uld",
+  discover:"dih-SKUV-er", evening:"EEV-ning", surprising:"ser-PRY-zing", spending:"SPEN-ding",
+  practically:"PRAK-tik-lee", understood:"un-der-STOOD", perhaps:"per-HAPS", content:"kun-TENT",
+  differently:"DIF-er-ent-lee", tantrum:"TAN-trum", hardest:"HAR-dist", strength:"STRENGKTH",
+  thoughts:"THAWTS", drifting:"DRIF-ting", strangely:"STRAYNJ-lee", precisely:"prih-SYS-lee",
+  teasing:"TEE-zing", difficult:"DIF-ih-kult", strikes:"STRYKS", invite:"in-VYT",
+  burning:"BER-ning", gentler:"JENT-ler", remembering:"rih-MEM-ber-ing", storming:"STOR-ming",
+  bedroom:"BED-room", shrieking:"SHREE-king", blazing:"BLAY-zing", smolder:"SMOHL-der",
+  flawless:"FLAW-lis", weekend:"WEEK-end", visited:"VIZ-it-id", downtown:"DOWN-town",
+  alongside:"uh-LONG-syd", singing:"SING-ing", several:"SEV-er-ul", moments:"MOH-ments",
+  pleased:"PLEEZD", clamped:"KLAMPT", shouted:"SHOW-tid", volume:"VOL-yoom",
+  doubled:"DUB-uld", awake:"uh-WAYK", turning:"TER-ning", choosing:"CHOO-zing",
+  purpose:"PER-pus", somebody:"SUM-bah-dee", basically:"BAY-sik-lee", quieter:"KWY-it-er",
+  roaring:"ROR-ing", stepped:"STEPT", plugged:"PLUGD", fingers:"FING-gerz",
+  reaction:"ree-AK-shun", stirring:"STER-ing", breathe:"BREETH"
 };
 function countSyllables(word) {
   const w = word.toLowerCase().replace(/[^a-z]/g, '');
@@ -3377,23 +3435,92 @@ let spellHintShown = false;
 let spellPeekShown = false;
 let spellSlots = [];   // array of filled letters (or null) per slot
 let spellTiles = [];   // array of { id, letter, used }
+let spellGroups = [];  // array of arrays — words chunked into groups of 10, stable order
+let spellCurrentGroup = -1; // -1 = showing the group picker, not yet in a group
+const SPELL_GROUP_SIZE = 10;
+
+// The practice-mode markup, kept as a template so the group picker and
+// completion screens (which replace #spell-body wholesale) can be undone.
+const SPELL_PRACTICE_BODY_HTML = `
+    <button id="spell-speak-btn" onclick="speakSpellWord()">🔊 Hear the Word</button>
+    <div id="spell-hints-cluster">
+      <div id="spell-hint-row">
+        <button id="spell-hint-btn" onclick="toggleSpellHint()">👀 Hint</button>
+        <button id="spell-letter-hint-btn" onclick="revealNextSpellLetter()">🔤 Letter</button>
+        <button id="spell-decoy-btn" onclick="toggleSpellDecoys()">➖ Extras</button>
+        <button id="spell-peek-btn" onclick="toggleSpellPeek()">🔑 Peek</button>
+      </div>
+      <div id="spell-hint-text"></div>
+      <div id="spell-peek-text"></div>
+    </div>
+    <div id="spell-slots"></div>
+    <div id="spell-tiles"></div>
+    <button id="spell-undo-btn" onclick="undoSpellTile()">⌫ Undo</button>
+    <div id="spell-feedback"></div>
+`;
 
 function openSpellModal() {
   // Use every word from this session's Word Cards, deduped (a word flagged
-  // for repeat practice shouldn't be spelled multiple times), freshly shuffled.
+  // for repeat practice shouldn't be spelled multiple times). Order is kept
+  // stable (not shuffled) so groups mean the same thing every time this is
+  // opened — "Group 3" always holds the same words, so it's easy to jump
+  // straight back to wherever practice left off.
   const seen = new Set();
   const unique = [];
   wordCardsList.forEach(w => {
     if (!seen.has(w.word)) { seen.add(w.word); unique.push(w); }
   });
-  spellWords = shuffleArray(unique);
-  spellIndex = 0;
+  spellGroups = [];
+  for (let i = 0; i < unique.length; i += SPELL_GROUP_SIZE) {
+    spellGroups.push(unique.slice(i, i + SPELL_GROUP_SIZE));
+  }
+  spellCurrentGroup = -1;
   document.getElementById('spell-speak-btn').style.display = ('speechSynthesis' in window) ? '' : 'none';
   document.getElementById('spell-modal').classList.add('open');
-  renderSpellWord();
+  renderSpellGroupPicker();
 }
 function closeSpellModal() {
   document.getElementById('spell-modal').classList.remove('open');
+}
+
+function renderSpellGroupPicker() {
+  document.getElementById('spell-groups-btn').style.display = 'none';
+  document.getElementById('spell-progress-label').textContent = '';
+  document.getElementById('spell-dots').innerHTML = '';
+  document.getElementById('spell-prev-btn').style.display = 'none';
+  document.getElementById('spell-next-btn').style.display = 'none';
+
+  if (!spellGroups.length) {
+    document.getElementById('spell-body').innerHTML = '<div class="vocab-empty">No words to practice yet!</div>';
+    return;
+  }
+
+  document.getElementById('spell-body').innerHTML =
+    '<div class="wc-summary-title">📇 Choose a Group</div>' +
+    '<div class="wc-summary-sub">Pick up right where you left off!</div>' +
+    '<div class="spell-group-list">' +
+    spellGroups.map((group, i) =>
+      '<button class="spell-group-btn" onclick="startSpellGroup(' + i + ')">' +
+        '<span>Group ' + (i + 1) + '</span>' +
+        '<span class="sg-count">' + group.length + ' word' + (group.length === 1 ? '' : 's') + '</span>' +
+      '</button>'
+    ).join('') +
+    '</div>';
+}
+
+function startSpellGroup(groupIndex) {
+  spellCurrentGroup = groupIndex;
+  spellWords = shuffleArray(spellGroups[groupIndex]); // shuffle within the group only
+  spellIndex = 0;
+  document.getElementById('spell-body').innerHTML = SPELL_PRACTICE_BODY_HTML;
+  document.getElementById('spell-groups-btn').style.display = '';
+  document.getElementById('spell-prev-btn').style.display = '';
+  document.getElementById('spell-next-btn').style.display = '';
+  renderSpellWord();
+}
+
+function backToSpellGroups() {
+  renderSpellGroupPicker();
 }
 
 function generateSpellTiles(word) {
@@ -3582,14 +3709,17 @@ function spellNextWord() {
 }
 
 function renderSpellCompletion() {
+  const hasNextGroup = spellCurrentGroup < spellGroups.length - 1;
   document.getElementById('spell-body').innerHTML =
     '<div class="wc-summary-title">🎉 Great Spelling Practice!</div>' +
-    '<div class="wc-summary-sub">You worked through ' + spellWords.length + ' word' + (spellWords.length === 1 ? '' : 's') + '.</div>' +
-    '<button id="spell-done-btn" onclick="closeSpellModal()">✅ Done</button>';
+    '<div class="wc-summary-sub">You finished Group ' + (spellCurrentGroup + 1) + ' — ' + spellWords.length + ' word' + (spellWords.length === 1 ? '' : 's') + '.</div>' +
+    '<button id="spell-back-groups-btn" onclick="backToSpellGroups()">📇 Back to Groups</button>' +
+    (hasNextGroup ? '<button id="spell-next-group-btn" onclick="startSpellGroup(' + (spellCurrentGroup + 1) + ')">▶️ Next Group</button>' : '');
   document.getElementById('spell-progress-label').textContent = '';
+  document.getElementById('spell-groups-btn').style.display = 'none';
   document.getElementById('spell-dots').innerHTML = '';
-  document.getElementById('spell-prev-btn').disabled = false;
-  document.getElementById('spell-next-btn').disabled = true;
+  document.getElementById('spell-prev-btn').style.display = 'none';
+  document.getElementById('spell-next-btn').style.display = 'none';
 }
 
 
@@ -4865,200 +4995,194 @@ She is a light that was made to shine — not to cast shadows on the people she 
 ];
 
 const bensonBiblePages = [
-  { title: 'The Hill', text: `One day, a huge crowd walked up a big grassy hill.
+  { title: 'The Hill', text: `Word travels fast in a small town. On this particular afternoon, it traveled all the way to Benson's street.
 
-Nobody told them to go. They just heard that Jesus was there — and they went.
+Jesus had arrived. He was teaching on a hill just beyond the fields.
 
-Benson went too.
+A crowd gathered almost instantly. Benson tagged along, curious despite himself.
 
-Jesus sat down in the grass. No crown. No fancy chair. Just Jesus, sitting on a hill, smiling at everyone like he loved every single one of them.
+There was no throne waiting for Jesus. No golden chair, no fancy robe. Just a man sitting cross-legged in the grass, grinning at the crowd like he already knew every one of them.
 
-<div class="bible-verse">"And then he started talking."</div>
+Then he cleared his throat. The entire hillside went silent.
 
-<div class="closing-note">📖 What he said that day changed everything.</div>` },
-  { title: 'The Boy Who Felt Like He Wasn\'t Enough', text: `Jesus looked out at the crowd and said:
+<div class="closing-note">📖 Nothing about that afternoon would turn out to be normal at all.</div>` },
+  { title: 'The Boy Who Felt Like He Wasn\'t Enough', text: `Jesus looked out across the crowd and began:
 
-<div class="bible-verse">"Blessed are the poor in spirit — for theirs is the kingdom of heaven."</div>
+<div class="bible-verse">"Blessed are those who feel empty inside. Heaven belongs especially to them."</div>
 
-A boy named Eli leaned over to Benson.
+Beside Benson sat a boy he didn't recognize. Freckled, sunburnt, and who could not sit still. His name, Benson would soon learn, was Eli.
 
-<div class="eli-bubble">💬 "My dad told me what that means. It means the people who feel like they're not enough — too small, too angry, too broken — those are the ones God is closest to."</div>
+<div class="eli-bubble">💬 "My father explained that verse to me once. It's for people who feel like they don't measure up. Too small. Too quick to anger. Too impossible to fix. Turns out those are the exact people God stays nearest to."</div>
 
-Benson got very quiet.
+Benson went very still.
 
-He knew that feeling.
+He recognized that feeling immediately. The one from losing his temper with Kate and being not able to stop. The one from getting beaten badly on the soccer court and sulking about it afterward. The one from watching Kylie flatten his Legos and losing all control.
 
-The feeling after he screamed at Kate and couldn't stop. The feeling after he cried on the trampoline in front of everyone. The feeling after Kylie knocked over his Legos and he lost it completely.
+The same thought, again: <em>I've done it again. Something must be wrong with me.</em>
 
-That feeling of: <em>I did it again. Something is wrong with me.</em>
+<div class="prayer-bubble">Jesus seemed to look directly at Benson as he spoke.<br><br><em>Those people are never forgotten. They are exactly who this blessing is for.</em></div>` },
+  { title: 'The Volcano Inside', text: `Here's a secret about Benson. Almost nobody could guess it just by looking at him: somewhere beneath his ribs lived an actual volcano.
 
-<div class="prayer-bubble">Jesus looked like he was talking straight to Benson.<br><br><em>Those people are not forgotten. They are blessed.</em></div>` },
-  { title: 'The Volcano Inside', text: `Here is something true about Benson.
+Most days, it stayed dormant. Most days, Benson was cheerful and a little ridiculous, constructing Lego towers so magnificent that grown-ups stopped to admire them.
 
-He has a volcano inside him.
+But every so often, without warning, something set it rumbling.
 
-Most of the time it is quiet. Most of the time Benson is sweet and funny and kind and he builds the most incredible Lego creations you have ever seen.
+Maybe Kate corrects him for the tenth time that hour. She uses that certain tone that means she already knows she's right. Whatever the spark, something inside Benson ignites like a match tossed into dry grass.
 
-But then something happens.
+<div class="volcano-bubble">🌋 His eyes roll back. His shoulders tense. A sound builds in his chest like a kettle working itself into a shriek.<br><br><strong>"GET AWAY FROM ME!"</strong></div>
 
-Kate sits too close at breakfast. Her leg touches his. Something fires up inside Benson like a rocket.
+Or maybe it's Kylie. Barely two, entirely innocent. She toddles over to his most delicate creation. It took nearly an hour to build. She flattens it with one happy smack of her palm.
 
-<div class="volcano-bubble">🌋 His eyes roll back. His head drops. A sound builds up in his chest like a teapot about to explode.<br><br><strong>"GET AWAY FROM ME."</strong></div>
+And just like that: eruption.
 
-Or Kylie, who is two years old and means no harm at all, toddles over to his most delicate Lego creation — the one he spent forty-five minutes building — and knocks it over with one happy little hand.
+<div class="volcano-bubble">⚡ Afterward, Benson always realized the same thing. The volcano never actually solved anything. It only left a bigger mess behind. Every single time.</div>
 
-And the volcano erupts.
+<p>He simply had no idea how to switch it off.</p>` },
+  { title: 'Eleven to Three', text: `On a trip to Brazil, Benson played a scrappy one-on-one soccer match against a boy named Leo. Leo was younger, much smaller, and and fearless.
 
-<div class="volcano-bubble">⚡ Benson always knew, afterward, that the volcano made things worse. Not better. It <em>always</em> made things worse.</div>
+Benson scored almost immediately. Then again. And again, until the score climbed to an eleven to three.
 
-<p>He just didn't know how to stop it.</p>` },
-  { title: 'Leo on the Trampoline', text: `One time, Benson was jumping on the trampoline with his friends. They had a game. Each person got a turn. Everyone was waiting in line.
+Yet Leo seemed not bothered at all. He chased every ball with so much energy. He laughed loudly each time Benson scored on him. Losing badly seemed like the most fun thing that had ever happened to him.
 
-A little boy named Leo — smaller than Benson, younger than Benson — cut right in front of him.
+Benson's father had been watching quietly from the side. At a water break, he crouched beside Benson. He asked quietly:
 
-The volcano fired up instantly.
+<div class="bible-verse">"Have you noticed Leo hasn't stopped smiling this whole match? Down eleven to three, and he's having the time of his life."</div>
 
-<div class="volcano-bubble">🌋 Benson erupted. He sat down right on the trampoline and cried. He crossed his arms. He refused to play.</div>
+Benson had noticed. He just hadn't thought it was strange — until now.
 
-And while Benson sat there, Leo kept jumping. Kept playing. Kept laughing.
+<div class="eli-bubble">His father continued. "You know, most times you start losing — any game, any sport — you burst into tears. You get furious. You accuse everyone else of cheating. Then you plop down and refuse to keep playing."</div>
 
-And then — because he saw it was working — Leo did it again. And again.
+Benson wanted to argue. Unfortunately, he couldn't.
 
-Every time Benson erupted, Leo smiled. Because Leo knew exactly which button to push.
+They returned to the court. The score climbed even higher in Benson's favor. Leo remained just as happy as before — still laughing, still chasing, still really enjoying himself.
 
-Benson's dad watched all of this.
+This time, something shifted in Benson too. He wasn't just winning anymore. He found himself really enjoying Leo's happiness.
 
-There was a bigger boy playing that day too, named Rudra. Rudra thought what Leo did was mean. But he'd also noticed that Benson was easy to tease — quick to cry, and not always easy to play with. Before they left, Rudra told Benson's dad, "We really like playing with Benson. We just wish he'd whine and complain less, and go with the flow more."
+He couldn't quite explain how that had happened. It didn't feel like something he'd puzzled out on his own.
 
-Later that night, he sat next to Benson and said something quietly — something Benson never forgot:
+It felt, instead, like God had quietly cracked open a joy inside him. A joy that had been closed up his whole life.
 
-<div class="bible-verse">"Buddy. Leo was trying to steal your joy. And you handed it right to him."</div>
+<div class="bible-verse">"Buddy. Look how happy Leo is — win or lose. That's a gift. Ask God to help you discover that same joy."</div>
 
-<div class="closing-note">💭 Benson thought about that for a long time.</div>` },
-  { title: 'Blessed Are the Meek', text: `Back on the hill, Jesus kept talking.
+<div class="closing-note">💭 Benson thought about that for a long, long while.</div>` },
+  { title: 'Easy to Play With', text: `Walking home that evening, Benson realized something surprising. He wanted to keep spending time with Leo — not only on the soccer court, but doing practically anything. Wandering through the park. Building something ridiculous out of spare parts. Simply being in the same space.
 
-<div class="bible-verse">"Blessed are the meek."</div>
+It was because Leo understood something Benson didn't: how to roll with whatever happened.
 
-Eli's eyes went wide.
+<div class="bible-verse">Benson thought of an older boy named Rudra saying something almost the same once.</div>
 
-<div class="eli-bubble">💬 "My uncle told me about this one. Meek doesn't mean weak. It means you're strong enough that you don't have to prove it."</div>
+Perhaps that's exactly what it meant. Staying content whether you're winning or losing, whether life goes along with your plans or not.
 
-Benson thought about Leo.
+He imagined the afternoon going differently. What if Leo had thrown a tantrum every time he lost a point? What if he'd blamed Benson for playing too rough? Benson wouldn't have wanted anything more to do with him — not soccer, not anything.
 
-Leo had pushed his buttons because Benson's buttons were so easy to push.
+Instead, Leo kept grinning. And that, made Benson want to be around him even more.
 
-But what if they weren't?
+<div class="victory-bubble">🌟 Benson understood it now. When he smiled and kept trying his hardest, even while losing, people wanted him around for everything. Not just games. Sleepovers. Trips to the park. Every bit of it.</div>
 
-What if, when Leo cut in line, Benson had just… kept jumping?
+<div class="closing-note">💭 Benson thought about that for a long, long time.</div>` },
+  { title: 'Blessed Are the Meek', text: `Back on top of the hill, Jesus kept teaching.
 
-Not because Leo was right. Not because it didn't matter.
+<div class="bible-verse">"Blessed are the gentle — for one day, the whole world will belong to them."</div>
 
-But because Benson knew who he was. And Leo couldn't take that away.
+Eli's eyes lit right up.
 
-<div class="bible-verse">Blessed are the meek.</div>
+<div class="eli-bubble">💬 "My uncle explained this exact verse to me. Being gentle doesn't mean being feeble. It means having enough inner strength that you never need to prove it to a single soul."</div>
 
-<div class="eli-bubble">💪 <em>Strong enough on the inside that nothing on the outside can knock you over.</em></div>` },
-  { title: 'The Hardest Thing Jesus Said', text: `Then Jesus said the part that made everyone go quiet.
+Benson found his thoughts drifting back to Leo. Leo's buttons had been so easy to push, once upon a time. Except, strangely, they no longer seemed to exist.
 
-<div class="bible-verse">"Love your enemies. Pray for the people who hurt you."</div>
+What if, the second someone tried to bug him, Benson simply... kept playing?
 
-<em>"That's impossible,"</em> Benson said out loud.
+Not because the other person was right. Not because it didn't sting a little. But because Benson already knew precisely who he was. And nothing anyone else did could take that away.
 
-Jesus looked right at him.
+<div class="bible-verse">Blessed are the gentle.</div>
 
-<div class="bible-verse">"I know. That's why you don't do it alone."</div>
+<div class="eli-bubble">💪 <em>Strong enough within that nothing from outside — not winning, not losing, not teasing — can ever knock you down.</em></div>` },
+  { title: 'The Hardest Thing Jesus Said', text: `Then Jesus said something that made the whole hillside go quiet.
 
-Eli nodded slowly.
+<div class="bible-verse">"You have heard it said: be kind to those who are kind to you. But I tell you — love your enemies. Pray for those who make your life difficult. If someone strikes your cheek, offer the other one as well."</div>
 
-<div class="eli-bubble">💬 "My dad says when he gets really angry, he closes his eyes and asks God to take the angry feeling and fill that space with love instead. He says it actually works."</div>
+<em>"That's impossible,"</em> Benson blurted.
 
-Benson thought about that.
+Jesus turned and looked right at him.
 
-Not fighting the volcano by himself. Asking God to come inside and change what was there.
+<div class="bible-verse">"I know. That's exactly why you were never meant to try it alone."</div>
 
-<div class="prayer-bubble">🙏 "God. Take this feeling away from me.<br>Fill me with love instead."</div>` },
-  { title: 'You Are a Light', text: `Jesus stood up.
+Eli thought about this for a while before speaking.
 
-He looked out at everyone on the hill.
+<div class="eli-bubble">💬 "My father said something like that. Whenever fury gets the better of him, he shuts his eyes. He hands the whole mess over to God — trades the anger for something calmer. He says it really works, every time."</div>
 
-<div class="bible-verse">"You are the light of the world. Don't hide your light. Let it shine."</div>
+Benson thought it over. Perhaps he wasn't supposed to fight the volcano alone. Perhaps he was meant to invite God straight into the middle of it, and let something else take its place.
 
-Benson sat very still.
+<div class="prayer-bubble">🙏 "God — please take hold of what's burning in me right now, and leave something gentler behind."</div>` },
+  { title: 'You Are a Light', text: `Jesus stood and looked out over the entire hillside.
 
-He thought about the times his light had gone out. When the volcano came. When he sat on the trampoline and cried. When he slammed the door. When he screamed at Kylie over Legos.
+<div class="bible-verse">"You are light for the whole world. Don't tuck that light away — let it blaze."</div>
 
-He didn't want to hide his light.
+Benson sat rigid, remembering every time his own light had gone dark. The volcano taking control. Storming off the soccer court. Slamming his bedroom door. Shrieking at Kylie over scattered Legos.
 
-He wanted to shine.
-
-But he knew he couldn't do it alone.
+He no longer wanted to hide his light. He wanted it blazing. But he also understood he couldn't manage that by himself.
 
 <div class="closing-note">✨ <em>Nobody can. That's the whole point.</em></div>
 
-He closed his eyes right there on the hillside.
+Right there on the hillside, he shut his eyes.
 
-<div class="prayer-bubble">🙏 "God. I have a volcano inside me. I don't want it anymore.<br>Please take the angry feeling when it comes.<br>Fill me with love instead.<br>Help me shine.<br>Amen."</div>
+<div class="prayer-bubble">🙏 "God — please take hold of what's burning in me right now, and leave something gentler behind. Help me shine instead of smolder."</div>
 
-Something felt different. Not fixed. Not perfect.
+Something shifted. Nothing was fixed. Nothing was flawless. But it was different — like a door had opened just wide enough to let a sliver of light spill through.` },
+  { title: 'Singing Too Loud', text: `That weekend, Benson visited the kids' club downtown. Kate came along too, alongside a bunch of kids.
 
-But different. Like a door had been opened just a crack, and light was coming through.` },
-  { title: 'The Next Morning', text: `The next morning at breakfast, Kate's leg touched Benson's under the table.
+The moment the music started, Kate began singing the words as loud as she could. A few kids joined in. Then several more. Within moments, nearly the entire room was singing along, off-key and pretty pleased with itself.
 
-The volcano started to rumble.
+Benson clamped both hands over his ears. The noise felt like a drill boring straight through his skull.
 
-He felt it coming — the eye roll, the head drop, the sound building up in his chest.
+<div class="volcano-bubble">🌋 <strong>"STOP! MY EARS HURT!"</strong> he shouted.</div>
 
-He closed his eyes.
+Nobody stopped. If anything, the volume doubled.
 
-<div class="prayer-bubble">🙏 "God. Take this feeling away from me. Fill me with love instead."</div>
+Kate noticed. His tight, angry face. His hands clamped tight. Rather than easing up, she leaned in close and sang directly at him — louder still, grinning the entire time.
 
-He opened his eyes.
+The volcano roared awake fast.
 
-Kate was eating her cereal and not even looking at him. She didn't even know her leg had touched his.
+He wanted to scream. He wanted to bolt out the door and never return.
 
-Benson picked up his spoon and kept eating.
+Instead, he remembered something. Turning the other cheek didn't mean giving up. It meant choosing peace on purpose, even when somebody was basically asking for a fight.
 
-He sat there very still for a moment. Waiting.
+He shut his eyes.
 
-And then something happened that he had not expected at all.
+<div class="prayer-bubble">🙏 "God — please take hold of what's burning in me right now, and leave something gentler behind."</div>
 
-The feeling actually went away.
+He drew one slow breath. Then another.
 
-Not all at once. More like when you stub your toe really hard and it HURTS — and you're sure it will never stop hurting — but then, little by little, without you doing anything at all, it just... fades. Until it's completely gone.
+He opened his eyes and said, as calm as he could, "Kate, could you please sing a little quieter? It really hurts my ears."
 
-<div class="victory-bubble">🌟 The volcano went quiet.</div>
+Kate only grinned wider and sang louder still.
 
-Benson blinked. He could not believe it.
+The familiar fire came roaring back. But this time, Benson didn't explode, and he didn't storm off either.
 
-<div class="eli-bubble">He had prayed a simple prayer — and God had actually answered. Right there at the breakfast table. In front of the cereal bowls.</div>
+He simply stepped back, plugged both ears with his fingers, and waited it out. He hummed his own ridiculous little tune until the song finally ended.
 
-It wasn't magic. It was better than magic.
+<div class="victory-bubble">🌟 The volcano stayed quiet.</div>
 
-It was like God's hand had reached right into his chest and gently turned the volcano off.
+Benson blinked, hardly able to believe it.
 
-It didn't feel like a big deal.
+<div class="eli-bubble">Kate hadn't stopped. She hadn't even noticed she'd done anything wrong. But somehow, none of that mattered as much as he expected.</div>
 
-But it was one of the biggest things Benson had ever done.` },
-  { title: 'What Benson Knows Now', text: `Benson still has a volcano inside him.
+It wasn't magic. It was better than magic. It felt like God had reached into his chest and helped him hold steady. Even while the world around him did not change one bit.
 
-It will probably rumble tomorrow. But now he knows something he didn't know before.
+It didn't feel like a big deal. But it was one of the biggest things Benson had ever done.` },
+  { title: 'What Benson Knows Now', text: `Benson still carries a volcano somewhere inside him.
 
-He doesn't have to fight it alone.
+It'll probably rumble again tomorrow. But now he knows something he never used to know: he doesn't have to fight it alone.
 
-<div class="eli-bubble">When Leo pushes his buttons — <em>"God, take this feeling away from me."</em><br>When Kate explodes at him — <em>"God, take this feeling away from me."</em><br>When Kylie knocks over his Legos — <em>"God, take this feeling away from me."</em></div>
+<div class="eli-bubble">When he starts losing a game — <em>"God — please take hold of what's burning in me right now."</em><br>When Kate sings too loud just to get a reaction — <em>"God — please take hold of what's burning in me right now."</em><br>When Kylie topples his Legos — <em>"God — please take hold of what's burning in me right now."</em></div>
 
-<div class="bible-verse">Blessed are the peacemakers — for they shall be called children of God.</div>
+<div class="bible-verse">Blessed are those who choose peace — for they will be called children of God.</div>
 
-<div class="victory-bubble">🌟 Children of God. That's who Benson is.<br>Not a volcano. A light.</div>
+<div class="victory-bubble">🌟 Children of God — that's exactly who Benson is.<br>Not a volcano. A light.</div>
 
-<div class="closing-note">💛 <em>Next time you feel the volcano starting — close your eyes, take one breath, and say:<br><br>"God. Take this feeling away from me. Fill me with love instead."<br><br>You don't have to be perfect. You just have to try.</em></div>` }
+<div class="closing-note">💛 <em>Next time you feel the volcano stirring, pause, and breathe once. Say whatever feels true to you:<br><br>"God, please take hold of what's burning in me, and leave something gentler behind."<br><br>You don't need the perfect words. You just need to mean them.</em></div>` }
 ];
 
-// ══ VERSION B — same story, same teaching, reworded sentence structure
-// and vocabulary so Benson has to actually read instead of reciting from
-// memory. Prayer wording is deliberately mixed between the original line
-// and a new alternative across the two versions — see page 9, which turns
-// that into an explicit lesson that the exact words don't matter.
 const bensonBiblePagesB = [
   { title: 'The Hill', text: `One day, word spread that Jesus was nearby. A huge crowd walked up a grassy hill just to see him.
 
@@ -5509,10 +5633,10 @@ function renderBiblePage(){
   const imgEl = document.getElementById('bible-img');
   const imgMap = bibleStory === 'kate_bible' ? kateBibleImgs : bensonBibleImgs;
   let imgKey = biblePageIdx + 1;
-  if (bibleStory === 'benson_bible' && bensonBibleVersion === 'C') {
-    // Version C has an extra page (index 4, "Easy to Play With") inserted right
-    // after the soccer scene, so pages from there on are shifted by one relative
-    // to the shared image set (which only has 9 slots).
+  if (bibleStory === 'benson_bible' && activeBensonBiblePages().length === 10) {
+    // A 10-page version has an extra page (index 4, "Easy to Play With") inserted
+    // right after the soccer scene, so pages from there on are shifted by one
+    // relative to the shared image set (which only has 9 slots).
     if (biblePageIdx === 4) imgKey = 4;       // new page reuses the soccer-scene image
     else if (biblePageIdx > 4) imgKey = biblePageIdx; // pages 6-10 -> images 5-9
   }
