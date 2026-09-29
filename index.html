@@ -2336,6 +2336,7 @@ function toggleGamePause(){
 }
 
 let raf;
+let gameLoopStarted = false;
 function gameLoop(){
   frameCount++;
   gx.clearRect(0,0,GW,GH);
@@ -4707,6 +4708,7 @@ function selectStory(which){
   vocabList=[];
   updateTabCount();
   renderBadges();
+  if(!gameLoopStarted){ gameLoopStarted = true; gameLoop(); }
   render(which==='kate' ? 'kate_start' : 'start');
 }
 
@@ -5704,7 +5706,11 @@ window.addEventListener('DOMContentLoaded', function(){
   window.scrollTo(0,0);
   // Show story selector — user picks which story to read
   document.getElementById('story-selector').style.display='flex';
-  gameLoop();
+  // Note: gameLoop() is intentionally NOT started here. It only starts once
+  // an adventure story is actually selected (see selectStory()) — starting
+  // a continuous canvas-drawing loop before the game screen is even visible
+  // wastes CPU/GPU on every device, and can meaningfully slow down initial
+  // page load on older/lower-power hardware.
 
   // Pause overlay — tap to resume
   const pauseOverlay = document.getElementById('game-pause-overlay');
