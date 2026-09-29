@@ -2117,7 +2117,7 @@ function spawnObs(){
   const sh = Math.round(t.h * scale);
   const isAir=t.star;
   const yPos=isAir ? groundY-80-Math.random()*40 : groundY-sh;
-  obstacles.push({...t, w:sw, h:sh, x:GW+20, y:yPos, speed:2.5+Math.random()*1.8, hit:false});
+  obstacles.push(Object.assign({}, t, {w:sw, h:sh, x:GW+20, y:yPos, speed:2.5+Math.random()*1.8, hit:false}));
 }
 function drawCloud(c){
   gx.fillStyle='rgba(255,255,255,.75)';
